@@ -5,7 +5,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ en
   const { endpointId } = await params;
   try {
     const body = await request.json();
-    return authFetchPath(`webhooks/${encodeURIComponent(endpointId)}`, { method: "PATCH", body: JSON.stringify(body) });
+    return authFetchPath(`webhooks/${encodeURIComponent(endpointId)}`, "", { method: "PATCH", body: JSON.stringify(body) });
   } catch {
     return NextResponse.json({ message: "Invalid JSON body" }, { status: 400 });
   }
@@ -13,5 +13,5 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ en
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ endpointId: string }> }) {
   const { endpointId } = await params;
-  return authFetchPath(`webhooks/${encodeURIComponent(endpointId)}`, { method: "DELETE" });
+  return authFetchPath(`webhooks/${encodeURIComponent(endpointId)}`, "", { method: "DELETE" });
 }
