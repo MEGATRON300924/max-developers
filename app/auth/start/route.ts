@@ -19,8 +19,10 @@ export async function GET(request: Request) {
   const verifier = base64url(crypto.randomBytes(48));
   const challenge = base64url(crypto.createHash("sha256").update(verifier).digest());
   const jar = await cookies();
-  jar.set("max_oauth_state", state, { httpOnly: true, secure: true, sameSite: "lax", path: "/auth", maxAge: 600 });
-  jar.set("max_oauth_verifier", verifier, { httpOnly: true, secure: true, sameSite: "lax", path: "/auth", maxAge: 600 });
+  const secure = process.env.NODE_ENV === "production";
+
+  jar.set("max_oauth_state", state, { httpOnly: true, secure, sameSite: "lax", path: "/auth", maxAge: 600 });
+  jar.set("max_oauth_verifier", verifier, { httpOnly: true, secure, sameSite: "lax", path: "/auth", maxAge: 600 });
 
   const url = new URL(`${authFrontend}/authorize`);
   url.searchParams.set("client_id", clientId);
