@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import {
   Activity,
   AppWindow,
@@ -17,6 +18,7 @@ import {
   ShieldCheck,
   Webhook,
 } from "lucide-react";
+import { getMaxUser } from "./lib/auth";
 
 const nav = [
   { label: "Home", href: "/", icon: LayoutDashboard, active: true },
@@ -88,26 +90,36 @@ function Sidebar() {
   );
 }
 
-function Topbar() {
+function Topbar({ user }: { user: NonNullable<Awaited<ReturnType<typeof getMaxUser>>> }) {
+  const displayName = user.name || user.preferred_username || user.email || "MAX Account";
+  const initial = displayName.trim().charAt(0).toUpperCase() || "M";
+
   return (
     <header className="topbar">
       <div className="breadcrumb">Developer Platform</div>
       <div className="account">
-        <div className="avatar">Z</div>
+        <div className="avatar">{initial}</div>
         <div className="account-copy">
-          <strong>MAX Account</strong>
+          <strong>{displayName}</strong>
+          {user.email ? <span>{user.email}</span> : null}
         </div>
+        <Link href="/auth/logout" className="account-action" aria-label="Sign out">
+          Sign out
+        </Link>
       </div>
     </header>
   );
 }
 
-export default function DeveloperHome() {
+export default async function DeveloperHome() {
+  const user = await getMaxUser();
+  if (!user) redirect("/sign-in");
+
   return (
     <div className="shell">
       <Sidebar />
       <div className="main">
-        <Topbar />
+        <Topbar user={user} />
         <main className="content">
           <section className="hero">
             <div>
