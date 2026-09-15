@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.name.ng";
-const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID;
+const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID || "max_client_cUC9DEVSPgxp8kh7";
 
 const accessCookie = "max_access_token";
 const refreshCookie = "max_refresh_token";
@@ -29,7 +29,7 @@ async function parseResponse(response: Response) {
 
 async function refreshSession(jar: Awaited<ReturnType<typeof cookies>>) {
   const refreshToken = jar.get(refreshCookie)?.value;
-  if (!refreshToken || !clientId) return null;
+  if (!refreshToken) return null;
 
   try {
     const response = await fetch(`${authApi}/api/v1/oauth/token`, {
