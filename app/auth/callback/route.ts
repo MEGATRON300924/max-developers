@@ -9,8 +9,10 @@ export async function GET(request: Request) {
   const jar = await cookies();
   const savedState = jar.get("max_oauth_state")?.value;
   const verifier = jar.get("max_oauth_verifier")?.value;
+  const next = jar.get("max_oauth_next")?.value;
+  const safeNext = next && next.startsWith("/") ? next : "/";
 
-  const fail = (reason: string) => NextResponse.redirect(new URL(`/sign-in?error=${encodeURIComponent(reason)}`, request.url));
+  const fail = (reason: string) => NextResponse.redirect(new URL(`/sign-in?error=${encodeURIComponent(reason)}&next=${encodeURIComponent(safeNext)}`, request.url));
   if (error) return fail(error);
   if (!code || !state || !savedState || state !== savedState || !verifier) return fail("invalid_oauth_response");
 
@@ -36,7 +38,7 @@ export async function GET(request: Request) {
   const token = await tokenResponse.json() as { access_token?: string; expires_in?: number };
   if (!token.access_token) return fail("missing_access_token");
 
-  const response = NextResponse.redirect(new URL("/", request.url));
+  const response = NextResponse.redirect(new URL(safeNext, request.url));
   response.cookies.set("max_access_token", token.access_token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -46,5 +48,6 @@ export async function GET(request: Request) {
   });
   response.cookies.delete("max_oauth_state");
   response.cookies.delete("max_oauth_verifier");
+  response.cookies.delete("max_oauth_next");
   return response;
 }
