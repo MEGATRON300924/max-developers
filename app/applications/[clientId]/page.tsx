@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Check, Copy, ExternalLink, KeyRound, Save, ShieldCheck, Trash2 } from "lucide-react";
+import { ArrowLeft, Check, Copy, Eye, EyeOff, ExternalLink, KeyRound, Save, ShieldCheck, Trash2 } from "lucide-react";
 
 type OAuthClient = {
   id: string;
@@ -32,7 +32,10 @@ export default function ApplicationDetailsPage({ params }: { params: Promise<{ c
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [revoking, setRevoking] = useState(false);
+  const [rotating, setRotating] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showSecret, setShowSecret] = useState(false);
+  const [newSecret, setNewSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [clientId, setClientId] = useState("");
 
@@ -100,9 +103,23 @@ export default function ApplicationDetailsPage({ params }: { params: Promise<{ c
     finally { setRevoking(false); }
   }
 
-  async function copyClientId() {
-    if (!client?.clientId) return;
-    await navigator.clipboard?.writeText(client.clientId);
+  async function rotateSecret() {
+    if (!client?.isConfidential || !client.isActive) return;
+    if (!window.confirm("Rotate this client secret? The current secret will stop working immediately.")) return;
+    setRotating(true); setError(null); setNewSecret(null); setShowSecret(false);
+    try {
+      const response = await fetch(`/api/applications/${encodeURIComponent(client.id)}`, { method: "POST" });
+      const data = await response.json() as { clientSecret?: string; message?: string };
+      if (!response.ok || !data.clientSecret) throw new Error(data.message || "Unable to rotate client secret.");
+      setNewSecret(data.clientSecret);
+      setShowSecret(true);
+    } catch (err) { setError(err instanceof Error ? err.message : "Unable to rotate client secret."); }
+    finally { setRotating(false); }
+  }
+
+  async function copyValue(value?: string) {
+    if (!value) return;
+    await navigator.clipboard?.writeText(value);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1600);
   }
@@ -133,7 +150,7 @@ export default function ApplicationDetailsPage({ params }: { params: Promise<{ c
 
               <section className="card" style={{marginTop:24}}>
                 <div className="section-heading"><div><h2>OAuth configuration</h2><p>These settings are used by MAX Auth when authorizing your application.</p></div></div>
-                <div className="credential" style={{marginTop:18}}><code>{client.clientId}</code><button className="icon-button" onClick={() => void copyClientId()} title="Copy client ID" aria-label="Copy client ID">{copied ? <Check size={15}/> : <Copy size={15}/>}</button></div>
+                <div className="credential" style={{marginTop:18}}><code>{client.clientId}</code><button className="icon-button" onClick={() => void copyValue(client.clientId)} title="Copy client ID" aria-label="Copy client ID">{copied ? <Check size={15}/> : <Copy size={15}/>}</button></div>
                 <div className="field-help" style={{marginTop:8}}>Client ID is safe to include in your public OAuth application.</div>
 
                 <div style={{display:"grid",gap:18,marginTop:24}}>
@@ -153,6 +170,12 @@ export default function ApplicationDetailsPage({ params }: { params: Promise<{ c
                   </div>
 
                   <div className="notice"><ShieldCheck size={18}/><div><strong>{client.isConfidential ? "Confidential OAuth client" : "Public PKCE OAuth client"}</strong><p>{client.isConfidential ? "This application uses a client secret and should keep it on a trusted server." : "This application does not use a client secret. Use Authorization Code + S256 PKCE for browser and mobile apps."}</p></div></div>
+
+                  {client.isConfidential ? <div className="card" style={{padding:16,background:"var(--surface-2)"}}>
+                    <div className="section-heading"><div><h2>Client secret</h2><p>Secrets are never stored or displayed by the developer portal. Rotate one only when you can update your trusted backend immediately.</p></div></div>
+                    {newSecret ? <div style={{marginTop:14}}><div className="field-label">New client secret <span className="field-help">This is the only time this value is shown.</span></div><div className="credential"><code>{showSecret ? newSecret : "•".repeat(Math.min(newSecret.length, 40))}</code><button className="icon-button" onClick={() => setShowSecret((value) => !value)} aria-label="Toggle secret visibility">{showSecret ? <EyeOff size={15}/> : <Eye size={15}/>}</button><button className="icon-button" onClick={() => void copyValue(newSecret)} aria-label="Copy client secret"><Copy size={15}/></button></div></div> : null}
+                    <div style={{display:"flex",justifyContent:"flex-end",marginTop:14}}><button className="secondary" onClick={() => void rotateSecret()} disabled={!client.isActive || rotating}>{rotating ? "Rotating…" : "Rotate client secret"}</button></div>
+                  </div> : null}
                 </div>
                 {client.isActive ? <div style={{display:"flex",justifyContent:"flex-end",marginTop:20}}><button className="primary" onClick={() => void save()} disabled={saving}><Save size={15} style={{verticalAlign:"-2px",marginRight:7}}/>{saving ? "Saving…" : "Save changes"}</button></div> : null}
               </section>
