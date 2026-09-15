@@ -21,5 +21,6 @@ export async function GET(request: Request) {
   const response = NextResponse.redirect(new URL("/sign-in", request.url));
   response.cookies.delete("max_access_token");
   response.cookies.delete("max_refresh_token");
+  response.cookies.delete("max_access_expires_at");
   return response;
 }
