@@ -32,7 +32,7 @@ export async function GET(request: Request) {
 
   const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID || DEFAULT_MAX_CLIENT_ID;
   const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.name.ng";
-  const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || new URL("/auth/callback", request.url).toString();
+  const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || "https://developers.max-ai.name.ng/auth/callback";
 
   let tokenResponse: Response;
   try {
