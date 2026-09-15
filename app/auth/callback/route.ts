@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
+function safeNext(value: string | null) {
+  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/";
+  return value;
+}
+
 export async function GET(request: Request) {
   const incoming = new URL(request.url);
   const code = incoming.searchParams.get("code");
@@ -10,9 +15,9 @@ export async function GET(request: Request) {
   const savedState = jar.get("max_oauth_state")?.value;
   const verifier = jar.get("max_oauth_verifier")?.value;
   const next = jar.get("max_oauth_next")?.value;
-  const safeNext = next && next.startsWith("/") ? next : "/";
+  const safeRedirect = safeNext(next);
 
-  const fail = (reason: string) => NextResponse.redirect(new URL(`/sign-in?error=${encodeURIComponent(reason)}&next=${encodeURIComponent(safeNext)}`, request.url));
+  const fail = (reason: string) => NextResponse.redirect(new URL(`/sign-in?error=${encodeURIComponent(reason)}&next=${encodeURIComponent(safeRedirect)}`, request.url));
   if (error) return fail(error);
   if (!code || !state || !savedState || state !== savedState || !verifier) return fail("invalid_oauth_response");
 
@@ -38,7 +43,7 @@ export async function GET(request: Request) {
   const token = await tokenResponse.json() as { access_token?: string; refresh_token?: string; expires_in?: number };
   if (!token.access_token || !token.refresh_token) return fail("missing_access_token");
 
-  const response = NextResponse.redirect(new URL(safeNext, request.url));
+  const response = NextResponse.redirect(new URL(safeRedirect, request.url));
   const secure = process.env.NODE_ENV === "production";
   const accessMaxAge = Math.max(60, token.expires_in ?? 3600);
   response.cookies.set("max_access_token", token.access_token, {
