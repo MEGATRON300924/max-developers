@@ -4,14 +4,20 @@ const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.nam
 const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID;
 
 function safeNext(value: string | null) {
-  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/";
+  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/";
   return value;
+}
+
+function getCookie(request: Request, name: string) {
+  const cookieHeader = request.headers.get("cookie") || "";
+  const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${name}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : null;
 }
 
 export async function GET(request: Request) {
   const incoming = new URL(request.url);
   const next = safeNext(incoming.searchParams.get("next"));
-  const refreshToken = request.headers.get("cookie")?.match(/(?:^|;\s*)max_refresh_token=([^;]+)/)?.[1];
+  const refreshToken = getCookie(request, "max_refresh_token");
 
   if (!refreshToken || !clientId) {
     const response = NextResponse.redirect(new URL(`/sign-in?next=${encodeURIComponent(next)}`, request.url));
