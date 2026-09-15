@@ -58,15 +58,19 @@ async function refreshSession(jar: Awaited<ReturnType<typeof cookies>>) {
   return token.access_token;
 }
 
-export async function authFetch(path: string, init?: RequestInit) {
+export async function authFetchPath(basePath: string, path = "", init?: RequestInit) {
   const jar = await cookies();
   let accessToken = jar.get(accessCookie)?.value;
   if (!accessToken) accessToken = await refreshSession(jar) || undefined;
   if (!accessToken) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-  const request = () => fetch(`${authApi}/api/v1/oauth/clients${path}`, {
+  const request = () => fetch(`${authApi}/api/v1/${basePath.replace(/^\/+|\/+$/g, "")}${path}`, {
     ...init,
-    headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json", ...(init?.headers || {}) },
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+      ...(init?.headers || {}),
+    },
     cache: "no-store",
   });
 
@@ -81,6 +85,10 @@ export async function authFetch(path: string, init?: RequestInit) {
 
   const body = await parseResponse(response);
   return NextResponse.json(body, { status: response.status });
+}
+
+export async function authFetch(path: string, init?: RequestInit) {
+  return authFetchPath("oauth/clients", path, init);
 }
 
 export async function clearSession() {
