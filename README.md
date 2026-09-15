@@ -33,12 +33,12 @@ The portal uses OAuth 2.0 Authorization Code + PKCE with S256 and does not requi
 
 ## Platform status
 
-The current implementation includes the following production-oriented platform areas:
+The current implementation includes:
 
 - MAX Account OAuth sign-in and callback handling
 - PKCE, state validation, secure session cookies, refresh-token rotation, and logout
 - Developer dashboard with live MAX Auth data
-- OAuth applications: list, detail, revoke, and management links
+- OAuth applications: list, detail, edit, revoke, and management links
 - Credentials: client IDs, public/confidential client handling, and secret rotation
 - API catalogue and real MAX Auth API endpoint references
 - Documentation for authentication, OAuth, errors, rate limits, and security
@@ -47,9 +47,8 @@ The current implementation includes the following production-oriented platform a
 - Webhooks: endpoint creation, subscriptions, testing, delivery history, secret rotation, and deletion
 - Activity and security event views
 - Developer settings
-- Official JavaScript/TypeScript SDK source under `packages/max-sdk-js`
-- Responsive light/dark MAX-branded interface
-- Production security headers and reduced framework fingerprinting
+- JavaScript/TypeScript SDK source under `packages/max-sdk-js`
+- Responsive MAX-branded interface
 - GitHub Actions build validation for the main branch and pull requests
 
 ## Architecture
@@ -67,15 +66,11 @@ MAX Auth is the identity and OAuth source of truth. MAX Developers acts as the d
 - OAuth client secrets are never displayed in normal listings
 - Webhook delivery signing and endpoint validation
 - Server-side authenticated API proxying
-- `X-Content-Type-Options: nosniff`
-- `X-Frame-Options: DENY`
-- Strict referrer policy
-- Restricted browser permissions
 - Next.js powered-by header disabled
 
 ## SDK
 
-The JavaScript/TypeScript SDK is currently maintained as a source package in this repository. It is not published to npm yet. The SDK supports authenticated API requests, userinfo, token introspection, and token revocation. OAuth authorization and PKCE remain handled by MAX Auth.
+The JavaScript/TypeScript SDK is currently maintained as a source package in this repository and is not published to npm yet. It supports authenticated API requests, UserInfo, token introspection, and token revocation. OAuth authorization and PKCE remain handled by MAX Auth.
 
 ## Repository status
 
