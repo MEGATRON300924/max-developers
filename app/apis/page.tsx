@@ -1,11 +1,24 @@
 import Link from "next/link";
-import { ArrowRight, BookOpen, Code2, KeyRound, LockKeyhole } from "lucide-react";
+import { ArrowRight, BookOpen, Code2, KeyRound, LockKeyhole, ExternalLink } from "lucide-react";
 
-const apiGroups = [
-  { name: "MAX Auth", status: "Available", description: "Identity, OAuth authorization and account access for applications using MAX Account.", endpoints: ["GET /authorize", "POST /api/v1/oauth/token", "GET /api/v1/oauth/userinfo"], href: "/documentation" },
-  { name: "MAX AI", status: "Coming soon", description: "Access the MAX AI capabilities that power the MAX AI Ecosystem.", endpoints: ["AI generation", "Conversations", "Personalisation"], href: "/documentation" },
-  { name: "MAX Cloud", status: "Coming soon", description: "Cloud services for applications and MAX-connected experiences.", endpoints: ["Storage", "Files", "Sync"], href: "/documentation" },
-  { name: "Webhooks", status: "Coming soon", description: "Receive signed events from MAX services in your backend.", endpoints: ["Event subscriptions", "Delivery", "Signing"], href: "/documentation" },
+const oauthEndpoints = [
+  { method: "GET", path: "/oauth/authorize", description: "Start the Authorization Code + S256 PKCE flow." },
+  { method: "POST", path: "/oauth/token", description: "Exchange an authorization code or refresh a token." },
+  { method: "GET / POST", path: "/oauth/introspect", description: "Inspect whether an OAuth access token is active." },
+  { method: "POST", path: "/oauth/revoke", description: "Revoke an OAuth access or refresh token." },
+  { method: "GET", path: "/oauth/userinfo", description: "Return claims allowed by the granted OAuth scopes." },
+];
+
+const publicEndpoints = [
+  { method: "GET", path: "/.well-known/openid-configuration", description: "OpenID Connect discovery metadata." },
+  { method: "GET", path: "/.well-known/jwks.json", description: "Public signing keys for MAX Auth OIDC ID tokens." },
+  { method: "GET", path: "/docs", description: "Interactive Swagger/OpenAPI documentation." },
+];
+
+const futureApis = [
+  { name: "MAX AI", description: "AI capabilities for the MAX AI Ecosystem.", items: ["Generation", "Conversations", "Personalisation"] },
+  { name: "MAX Cloud", description: "Cloud services for MAX-connected applications.", items: ["Storage", "Files", "Sync"] },
+  { name: "Webhooks", description: "Signed event delivery from MAX services.", items: ["Subscriptions", "Delivery", "Signing"] },
 ];
 
 export default function APIsPage() {
@@ -19,24 +32,32 @@ export default function APIsPage() {
       <div className="main">
         <header className="topbar"><div className="breadcrumb">APIs</div><div className="avatar">M</div></header>
         <main className="content">
-          <div className="eyebrow">API catalogue</div><h1>MAX APIs</h1><p className="lead">Explore the services that will make up the MAX developer platform. Availability is shown per API surface.</p>
+          <div className="eyebrow">API catalogue</div><h1>MAX APIs</h1><p className="lead">The current developer platform exposes MAX Auth as the production API surface. Other MAX services remain clearly marked until their APIs are actually available.</p>
 
           <section className="section" style={{marginTop:32}}>
-            <div style={{display:"grid",gap:12}}>
-              {apiGroups.map((api) => <article className="card" key={api.name}>
-                <div style={{display:"flex",justifyContent:"space-between",gap:16,alignItems:"flex-start"}}><div className="icon-box"><Code2 size={19}/></div><span className="status" style={{opacity:api.status === "Available" ? 1 : .6}}>{api.status}</span></div>
-                <h2 style={{fontSize:17,margin:"18px 0 5px",letterSpacing:"-.02em"}}>{api.name}</h2><p className="card-desc" style={{maxWidth:760}}>{api.description}</p>
-                <div style={{display:"flex",flexWrap:"wrap",gap:7,marginTop:14}}>{api.endpoints.map((endpoint) => <code key={endpoint} style={{padding:"7px 9px",border:"1px solid var(--border)",borderRadius:8,background:"var(--surface-soft)",fontSize:9,color:"var(--muted)"}}>{endpoint}</code>)}</div>
-                <div style={{marginTop:16}}><Link className="secondary" href={api.href}>View documentation <ArrowRight size={13} style={{marginLeft:6}}/></Link></div>
-              </article>)}
+            <div className="section-head"><div><h2 className="section-title">MAX Auth</h2><p className="section-desc">Base URL: <code>https://auth.max-ai.name.ng/api/v1</code></p></div><span className="status">Available</span></div>
+            <div className="card list">
+              {oauthEndpoints.map((endpoint) => <div className="list-row" key={`${endpoint.method}-${endpoint.path}`}><div className="icon-box"><LockKeyhole size={18}/></div><div className="row-main"><div className="row-title"><code>{endpoint.method}</code> <code>{endpoint.path}</code></div><div className="row-sub" style={{whiteSpace:"normal"}}>{endpoint.description}</div></div></div>)}
+            </div>
+          </section>
+
+          <section className="section">
+            <div className="section-head"><div><h2 className="section-title">Discovery & public metadata</h2><p className="section-desc">These endpoints live at the MAX Auth host rather than under <code>/api/v1</code>.</p></div></div>
+            <div className="card list">
+              {publicEndpoints.map((endpoint) => <div className="list-row" key={endpoint.path}><div className="icon-box"><Code2 size={18}/></div><div className="row-main"><div className="row-title"><code>{endpoint.method}</code> <code>{endpoint.path}</code></div><div className="row-sub" style={{whiteSpace:"normal"}}>{endpoint.description}</div></div></div>)}
             </div>
           </section>
 
           <section className="grid" style={{marginTop:16}}>
-            <div className="card"><LockKeyhole color="var(--blue)" size={20}/><h2 className="card-title" style={{marginTop:14}}>Authentication</h2><p className="card-desc">MAX Auth handles OAuth authorization and tokens for supported applications.</p></div>
-            <div className="card"><KeyRound color="var(--blue)" size={20}/><h2 className="card-title" style={{marginTop:14}}>Credentials</h2><p className="card-desc">Application credentials and future API keys will be managed from the Credentials area.</p><Link className="secondary" href="/credentials" style={{marginTop:16}}>View credentials</Link></div>
-            <div className="card"><BookOpen color="var(--blue)" size={20}/><h2 className="card-title" style={{marginTop:14}}>Guides</h2><p className="card-desc">Follow integration guides before calling a production API.</p><Link className="secondary" href="/documentation" style={{marginTop:16}}>Open docs</Link></div>
+            {futureApis.map((api) => <article className="card" key={api.name}><div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:16}}><div className="icon-box"><Code2 size={19}/></div><span className="status status-muted">Coming soon</span></div><h2 className="card-title" style={{fontSize:17,marginTop:18}}>{api.name}</h2><p className="card-desc">{api.description}</p><div style={{display:"flex",flexWrap:"wrap",gap:7,marginTop:14}}>{api.items.map((item) => <code key={item} style={{padding:"7px 9px",border:"1px solid var(--border)",borderRadius:8,background:"var(--surface-soft)",fontSize:9,color:"var(--muted)"}}>{item}</code>)}</div></article>)}
           </section>
+
+          <section className="grid" style={{marginTop:16}}>
+            <div className="card"><LockKeyhole color="var(--blue)" size={20}/><h2 className="card-title" style={{marginTop:14}}>Authentication</h2><p className="card-desc">Use OAuth 2.0 Authorization Code with S256 PKCE. Confidential clients additionally authenticate with their client secret at the token endpoint.</p></div>
+            <div className="card"><KeyRound color="var(--blue)" size={20}/><h2 className="card-title" style={{marginTop:14}}>Credentials</h2><p className="card-desc">Client IDs and confidential-client secrets are managed through MAX Auth. Standalone API keys are not available yet.</p><Link className="secondary" href="/credentials" style={{marginTop:16}}>View credentials <ArrowRight size={13}/></Link></div>
+            <div className="card"><BookOpen color="var(--blue)" size={20}/><h2 className="card-title" style={{marginTop:14}}>API reference</h2><p className="card-desc">The MAX Auth service publishes its OpenAPI/Swagger reference directly.</p><a className="secondary" href="https://auth.max-ai.name.ng/docs" target="_blank" rel="noreferrer" style={{marginTop:16}}>Open MAX Auth docs <ExternalLink size={13}/></a></div>
+          </section>
+
           <div className="footer"><Link href="/">← Back to dashboard</Link></div>
         </main>
       </div>
