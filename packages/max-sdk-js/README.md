@@ -2,11 +2,19 @@
 
 Official JavaScript / TypeScript client for the MAX Developer Platform.
 
-## Installation
+> **Current distribution:** The package is available in the MAX Developers source repository, but it has not been published to the public npm registry yet.
+
+## Build from source
+
+From the repository root:
 
 ```bash
-npm install @max-ai/sdk
+cd packages/max-sdk-js
+npm install
+npm run build
 ```
+
+The compiled package is written to `dist/`.
 
 ## Usage
 
@@ -19,6 +27,17 @@ const max = new MaxClient({
 
 const user = await max.userinfo();
 console.log(user);
+```
+
+For OAuth token revocation, provide the registered OAuth client ID. Confidential clients must also provide their client secret:
+
+```ts
+const max = new MaxClient({
+  clientId: process.env.MAX_CLIENT_ID,
+  clientSecret: process.env.MAX_CLIENT_SECRET,
+});
+
+await max.revoke(process.env.MAX_ACCESS_TOKEN!);
 ```
 
 The SDK uses the production MAX Auth API by default:
