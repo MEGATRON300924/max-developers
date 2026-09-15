@@ -10,9 +10,12 @@ export async function GET(request: Request) {
   const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID;
   const authFrontend = process.env.NEXT_PUBLIC_MAX_AUTH_FRONTEND_URL || "https://api.max-ai.name.ng";
   const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || new URL("/auth/callback", request.url).toString();
+  const incoming = new URL(request.url);
+  const next = incoming.searchParams.get("next");
+  const safeNext = next && next.startsWith("/") ? next : "/";
 
   if (!clientId || clientId.startsWith("REPLACE_")) {
-    return NextResponse.redirect(new URL("/sign-in?error=missing_client", request.url));
+    return NextResponse.redirect(new URL(`/sign-in?error=missing_client&next=${encodeURIComponent(safeNext)}`, request.url));
   }
 
   const state = base64url(crypto.randomBytes(32));
@@ -23,6 +26,7 @@ export async function GET(request: Request) {
 
   jar.set("max_oauth_state", state, { httpOnly: true, secure, sameSite: "lax", path: "/auth", maxAge: 600 });
   jar.set("max_oauth_verifier", verifier, { httpOnly: true, secure, sameSite: "lax", path: "/auth", maxAge: 600 });
+  jar.set("max_oauth_next", safeNext, { httpOnly: true, secure, sameSite: "lax", path: "/auth", maxAge: 600 });
 
   const url = new URL(`${authFrontend}/authorize`);
   url.searchParams.set("client_id", clientId);
