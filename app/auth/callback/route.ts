@@ -40,12 +40,20 @@ export async function GET(request: Request) {
 
   const response = NextResponse.redirect(new URL(safeNext, request.url));
   const secure = process.env.NODE_ENV === "production";
+  const accessMaxAge = Math.max(60, token.expires_in ?? 3600);
   response.cookies.set("max_access_token", token.access_token, {
     httpOnly: true,
     secure,
     sameSite: "lax",
     path: "/",
-    maxAge: Math.max(60, token.expires_in ?? 3600),
+    maxAge: accessMaxAge,
+  });
+  response.cookies.set("max_access_expires_at", String(Date.now() + accessMaxAge * 1000), {
+    httpOnly: true,
+    secure,
+    sameSite: "lax",
+    path: "/",
+    maxAge: accessMaxAge,
   });
   response.cookies.set("max_refresh_token", token.refresh_token, {
     httpOnly: true,
