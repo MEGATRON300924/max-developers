@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { AppWindow, Copy, ExternalLink, KeyRound, Plus, ShieldCheck, Trash2 } from "lucide-react";
+import { AppWindow, KeyRound, Plus, Settings2, ShieldCheck, Trash2 } from "lucide-react";
 
 type OAuthClient = {
   id: string;
@@ -80,6 +80,7 @@ export default function ApplicationsPage() {
                     <div className="row-sub">Redirect: {client.redirectUris[0] || "—"}</div>
                   </div>
                   <span className="status" style={{opacity:client.isActive ? 1 : .55}}>{client.isActive ? "Active" : "Revoked"}</span>
+                  <Link className="icon-button" href={`/applications/${encodeURIComponent(client.id)}`} title="Manage application" aria-label={`Manage ${client.name}`}><Settings2 size={16}/></Link>
                   {client.isActive ? <button className="icon-button" onClick={() => void revoke(client)} disabled={revoking === client.id} title="Revoke application" aria-label={`Revoke ${client.name}`}><Trash2 size={16}/></button> : null}
                 </div>
               ))}
