@@ -1,34 +1,24 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Activity, AppWindow, ArrowUpRight, BookOpen, Boxes, CheckCircle2, ChevronRight, Code2, ExternalLink, FileKey2, Gauge, KeyRound, LayoutDashboard, Settings, ShieldCheck, Webhook } from "lucide-react";
+import { Activity, AppWindow, ArrowUpRight, BookOpen, Boxes, CheckCircle2, ChevronRight, Code2, ExternalLink, FileKey2, Gauge, LayoutDashboard, Settings, ShieldCheck, Webhook } from "lucide-react";
 import { cookies } from "next/headers";
 import { getMaxUser } from "./lib/auth";
+import UsageCard from "./components/usage-card";
 
-type OAuthClient = {
-  id: string;
-  clientId: string;
-  name: string;
-  redirectUris: string[];
-  scopes: string[];
-  isActive: boolean;
-};
-
+type OAuthClient = { id: string; clientId: string; name: string; redirectUris: string[]; scopes: string[]; isActive: boolean; };
 const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.name.ng";
-
 const nav = [
   { label: "Home", href: "/", icon: LayoutDashboard, active: true },
   { label: "Applications", href: "/applications", icon: AppWindow },
   { label: "Credentials", href: "/credentials", icon: FileKey2 },
   { label: "Activity", href: "/activity", icon: Activity },
 ];
-
 const buildNav = [
   { label: "APIs", href: "/apis", icon: Code2 },
   { label: "Documentation", href: "/documentation", icon: BookOpen },
   { label: "Webhooks", href: "/webhooks", icon: Webhook },
   { label: "SDKs", href: "/sdks", icon: Boxes },
 ];
-
 const manageNav = [
   { label: "Security", href: "/security", icon: ShieldCheck },
   { label: "Settings", href: "/settings", icon: Settings },
@@ -38,30 +28,15 @@ async function getOAuthClients(): Promise<OAuthClient[]> {
   const accessToken = (await cookies()).get("max_access_token")?.value;
   if (!accessToken) return [];
   try {
-    const response = await fetch(`${authApi}/api/v1/oauth/clients`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-      cache: "no-store",
-    });
+    const response = await fetch(`${authApi}/api/v1/oauth/clients`, { headers: { Authorization: `Bearer ${accessToken}` }, cache: "no-store" });
     if (!response.ok) return [];
     const data = await response.json() as { clients?: OAuthClient[] };
     return data.clients || [];
-  } catch {
-    return [];
-  }
+  } catch { return []; }
 }
 
 function Sidebar() {
-  return (
-    <aside className="sidebar">
-      <div className="brand"><div className="logo">M</div><div className="brand-copy"><div className="brand-name">MAX</div><div className="brand-sub">Developer Platform</div></div></div>
-      <nav className="nav" aria-label="Developer Platform">
-        <div className="nav-group"><div className="nav-label">Platform</div>{nav.map(({ label, href, icon: Icon, active }) => <Link key={href} href={href} className={`nav-item${active ? " active" : ""}`}><Icon strokeWidth={1.8}/><span>{label}</span></Link>)}</div>
-        <div className="nav-group"><div className="nav-label">Build</div>{buildNav.map(({ label, href, icon: Icon }) => <Link key={href} href={href} className="nav-item"><Icon strokeWidth={1.8}/><span>{label}</span></Link>)}</div>
-        <div className="nav-group"><div className="nav-label">Manage</div>{manageNav.map(({ label, href, icon: Icon }) => <Link key={href} href={href} className="nav-item"><Icon strokeWidth={1.8}/><span>{label}</span></Link>)}</div>
-      </nav>
-      <div className="sidebar-foot"><strong>MAX AI Ecosystem</strong><br/>Build experiences that connect to MAX.</div>
-    </aside>
-  );
+  return <aside className="sidebar"><div className="brand"><div className="logo">M</div><div className="brand-copy"><div className="brand-name">MAX</div><div className="brand-sub">Developer Platform</div></div></div><nav className="nav" aria-label="Developer Platform"><div className="nav-group"><div className="nav-label">Platform</div>{nav.map(({ label, href, icon: Icon, active }) => <Link key={href} href={href} className={`nav-item${active ? " active" : ""}`}><Icon strokeWidth={1.8}/><span>{label}</span></Link>)}</div><div className="nav-group"><div className="nav-label">Build</div>{buildNav.map(({ label, href, icon: Icon }) => <Link key={href} href={href} className="nav-item"><Icon strokeWidth={1.8}/><span>{label}</span></Link>)}</div><div className="nav-group"><div className="nav-label">Manage</div>{manageNav.map(({ label, href, icon: Icon }) => <Link key={href} href={href} className="nav-item"><Icon strokeWidth={1.8}/><span>{label}</span></Link>)}</div></nav><div className="sidebar-foot"><strong>MAX AI Ecosystem</strong><br/>Build experiences that connect to MAX.</div></aside>;
 }
 
 function Topbar({ user }: { user: NonNullable<Awaited<ReturnType<typeof getMaxUser>>> }) {
@@ -78,41 +53,12 @@ export default async function DeveloperHome() {
   const displayName = user.name || user.preferred_username || user.email || "Developer";
   const firstName = displayName.trim().split(/\s+/)[0] || "Developer";
 
-  return (
-    <div className="shell"><Sidebar/><div className="main"><Topbar user={user}/><main className="content dashboard-content">
-      <section className="dashboard-hero"><div><div className="eyebrow">MAX Developer Platform</div><h1>Welcome back, {firstName}.</h1><p className="lead">Build, secure, and manage integrations across the MAX AI Ecosystem.</p></div><div className="hero-actions"><Link className="secondary" href="/documentation"><BookOpen size={15}/>Documentation</Link><Link className="primary" href="/applications/new"><AppWindow size={15}/>Create application</Link></div></section>
-
-      <section className="overview-grid" aria-label="Developer overview">
-        <Link href="/applications" className="overview-card"><div className="overview-icon"><AppWindow size={18}/></div><div className="overview-copy"><span>Applications</span><strong>{clients.length}</strong><small>{activeClients.length} active · managed by MAX Auth</small></div><ArrowUpRight className="overview-arrow" size={17}/></Link>
-        <Link href="/credentials" className="overview-card"><div className="overview-icon"><KeyRound size={18}/></div><div className="overview-copy"><span>Credentials</span><strong>—</strong><small>Credential management is being built</small></div><ArrowUpRight className="overview-arrow" size={17}/></Link>
-        <Link href="/apis" className="overview-card"><div className="overview-icon"><Gauge size={18}/></div><div className="overview-copy"><span>API platform</span><strong>1</strong><small>API surface currently available</small></div><ArrowUpRight className="overview-arrow" size={17}/></Link>
-      </section>
-
-      <div className="dashboard-columns">
-        <section className="dashboard-panel"><div className="panel-head"><div><h2>Applications</h2><p>Your OAuth applications registered in MAX Auth.</p></div><Link href="/applications" className="panel-link">View all <ArrowUpRight size={13}/></Link></div>
-          {clients.length ? <div className="dashboard-list">{clients.slice(0,4).map((client) => <Link key={client.id} href={`/applications/${encodeURIComponent(client.id)}`} className="dashboard-list-row"><div className="list-icon"><AppWindow size={17}/></div><div className="row-main"><div className="row-title">{client.name}</div><div className="row-sub mono">{client.clientId}</div></div><span className={`status${client.isActive ? "" : " status-muted"}`}>{client.isActive ? "Active" : "Revoked"}</span><ChevronRight size={16} className="row-chevron"/></Link>)}</div> : <div className="dashboard-empty"><div className="empty-icon"><AppWindow size={20}/></div><strong>No applications yet</strong><p>Create an OAuth application in MAX Auth and it will appear here automatically.</p><a className="secondary" href="https://auth.max-ai.name.ng/developer" target="_blank" rel="noreferrer">Open MAX Auth Developer <ExternalLink size={13}/></a></div>}
-        </section>
-
-        <aside className="dashboard-side">
-          <section className="dashboard-panel compact-panel"><div className="panel-head"><div><h2>API usage</h2><p>Usage data will appear when MAX APIs are available to your account.</p></div></div><div className="coming-card"><Gauge size={18}/><div><strong>Usage tracking</strong><span>No production API usage is available yet.</span></div></div></section>
-          <section className="dashboard-panel compact-panel"><div className="panel-head"><div><h2>Platform connection</h2><p>Core developer services connected to your MAX Account.</p></div></div><div className="connection-status"><CheckCircle2 size={18}/><div><strong>MAX Auth connected</strong><span>OAuth account and application data are available.</span></div></div></section>
-        </aside>
-      </div>
-
-      <section className="section dashboard-section"><div className="section-head"><div><h2 className="section-title">Get started</h2><p className="section-desc">The fastest path from your MAX Account to your first integration.</p></div></div><div className="starter-grid">
-        <Link href="/applications" className="starter-card"><div className="starter-number">01</div><div><strong>Register an application</strong><span>Create and configure OAuth clients in MAX Auth.</span></div><ChevronRight size={16}/></Link>
-        <Link href="/documentation" className="starter-card"><div className="starter-number">02</div><div><strong>Read the authentication guide</strong><span>Learn how Authorization Code + PKCE works with MAX.</span></div><ChevronRight size={16}/></Link>
-        <Link href="/apis" className="starter-card"><div className="starter-number">03</div><div><strong>Explore MAX APIs</strong><span>See available API surfaces and what is coming next.</span></div><ChevronRight size={16}/></Link>
-      </div></section>
-
-      <section className="section dashboard-section"><div className="section-head"><div><h2 className="section-title">Developer tools</h2><p className="section-desc">Manage the parts of your MAX integration from one place.</p></div></div><div className="quick-grid">
-        <Link href="/credentials" className="quick"><FileKey2/><div><strong>Credentials</strong><span>Keys and authentication credentials</span></div></Link>
-        <Link href="/webhooks" className="quick"><Webhook/><div><strong>Webhooks</strong><span>Event delivery and endpoint management</span></div></Link>
-        <Link href="/sdks" className="quick"><Boxes/><div><strong>SDKs</strong><span>Official SDK support and releases</span></div></Link>
-        <Link href="/security" className="quick"><ShieldCheck/><div><strong>Security</strong><span>Sessions, authorizations and security controls</span></div></Link>
-      </div></section>
-
-      <div className="footer">MAX Developer Platform · The MAX AI Ecosystem · <Link href="https://max-ai.name.ng" target="_blank">MAX AI <ExternalLink size={10}/></Link></div>
-    </main></div></div>
-  );
+  return <div className="shell"><Sidebar/><div className="main"><Topbar user={user}/><main className="content dashboard-content">
+    <section className="dashboard-hero"><div><div className="eyebrow">MAX Developer Platform</div><h1>Welcome back, {firstName}.</h1><p className="lead">Build, secure, and manage integrations across the MAX AI Ecosystem.</p></div><div className="hero-actions"><Link className="secondary" href="/documentation"><BookOpen size={15}/>Documentation</Link><Link className="primary" href="/applications/new"><AppWindow size={15}/>Create application</Link></div></section>
+    <section className="overview-grid" aria-label="Developer overview"><Link href="/applications" className="overview-card"><div className="overview-icon"><AppWindow size={18}/></div><div className="overview-copy"><span>Applications</span><strong>{clients.length}</strong><small>{activeClients.length} active · managed by MAX Auth</small></div><ArrowUpRight className="overview-arrow" size={17}/></Link><Link href="/credentials" className="overview-card"><div className="overview-icon"><FileKey2 size={18}/></div><div className="overview-copy"><span>Credentials</span><strong>—</strong><small>Credential management is being built</small></div><ArrowUpRight className="overview-arrow" size={17}/></Link><Link href="/apis" className="overview-card"><div className="overview-icon"><Gauge size={18}/></div><div className="overview-copy"><span>API platform</span><strong>1</strong><small>API surface currently available</small></div><ArrowUpRight className="overview-arrow" size={17}/></Link></section>
+    <div className="dashboard-columns"><section className="dashboard-panel"><div className="panel-head"><div><h2>Applications</h2><p>Your OAuth applications registered in MAX Auth.</p></div><Link href="/applications" className="panel-link">View all <ArrowUpRight size={13}/></Link></div>{clients.length ? <div className="dashboard-list">{clients.slice(0,4).map((client) => <Link key={client.id} href={`/applications/${encodeURIComponent(client.id)}`} className="dashboard-list-row"><div className="list-icon"><AppWindow size={17}/></div><div className="row-main"><div className="row-title">{client.name}</div><div className="row-sub mono">{client.clientId}</div></div><span className={`status${client.isActive ? "" : " status-muted"}`}>{client.isActive ? "Active" : "Revoked"}</span><ChevronRight size={16} className="row-chevron"/></Link>)}</div> : <div className="dashboard-empty"><div className="empty-icon"><AppWindow size={20}/></div><strong>No applications yet</strong><p>Create an OAuth application in MAX Auth and it will appear here automatically.</p><a className="secondary" href="https://auth.max-ai.name.ng/developer" target="_blank" rel="noreferrer">Open MAX Auth Developer <ExternalLink size={13}/></a></div>}</section><aside className="dashboard-side"><UsageCard/><section className="dashboard-panel compact-panel"><div className="panel-head"><div><h2>Platform connection</h2><p>Core developer services connected to your MAX Account.</p></div></div><div className="connection-status"><CheckCircle2 size={18}/><div><strong>MAX Auth connected</strong><span>OAuth account and application data are available.</span></div></div></section></aside></div>
+    <section className="section dashboard-section"><div className="section-head"><div><h2 className="section-title">Get started</h2><p className="section-desc">The fastest path from your MAX Account to your first integration.</p></div></div><div className="starter-grid"><Link href="/applications" className="starter-card"><div className="starter-number">01</div><div><strong>Register an application</strong><span>Create and configure OAuth clients in MAX Auth.</span></div><ChevronRight size={16}/></Link><Link href="/documentation" className="starter-card"><div className="starter-number">02</div><div><strong>Read the authentication guide</strong><span>Learn how Authorization Code + PKCE works with MAX.</span></div><ChevronRight size={16}/></Link><Link href="/apis" className="starter-card"><div className="starter-number">03</div><div><strong>Explore MAX APIs</strong><span>See available API surfaces and what is coming next.</span></div><ChevronRight size={16}/></Link></div></section>
+    <section className="section dashboard-section"><div className="section-head"><div><h2 className="section-title">Developer tools</h2><p className="section-desc">Manage the parts of your MAX integration from one place.</p></div></div><div className="quick-grid"><Link href="/credentials" className="quick"><FileKey2/><div><strong>Credentials</strong><span>Keys and authentication credentials</span></div></Link><Link href="/webhooks" className="quick"><Webhook/><div><strong>Webhooks</strong><span>Event delivery and endpoint management</span></div></Link><Link href="/sdks" className="quick"><Boxes/><div><strong>SDKs</strong><span>Official SDK support and releases</span></div></Link><Link href="/security" className="quick"><ShieldCheck/><div><strong>Security</strong><span>Sessions, authorizations and security controls</span></div></Link></div></section>
+    <div className="footer">MAX Developer Platform · The MAX AI Ecosystem · <Link href="https://max-ai.name.ng" target="_blank">MAX AI <ExternalLink size={10}/></Link></div>
+  </main></div></div>;
 }
