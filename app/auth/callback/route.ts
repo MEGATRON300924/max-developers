@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   const jar = await cookies();
   const savedState = jar.get("max_oauth_state")?.value;
   const verifier = jar.get("max_oauth_verifier")?.value;
-  const next = jar.get("max_oauth_next")?.value;
+  const next = jar.get("max_oauth_next")?.value ?? null;
   const safeRedirect = safeNext(next);
 
   const fail = (reason: string) => {
