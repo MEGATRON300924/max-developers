@@ -14,8 +14,12 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cli
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ clientId: string }> }) {
   const { clientId } = await params;
-  const body = await request.json();
-  return authFetch(`/${encodeURIComponent(clientId)}`, { method: "PATCH", body: JSON.stringify(body) });
+  try {
+    const body = await request.json();
+    return authFetch(`/${encodeURIComponent(clientId)}`, { method: "PATCH", body: JSON.stringify(body) });
+  } catch {
+    return NextResponse.json({ message: "Invalid JSON body" }, { status: 400 });
+  }
 }
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ clientId: string }> }) {
