@@ -17,7 +17,14 @@ export async function GET(request: Request) {
   const next = jar.get("max_oauth_next")?.value;
   const safeRedirect = safeNext(next);
 
-  const fail = (reason: string) => NextResponse.redirect(new URL(`/sign-in?error=${encodeURIComponent(reason)}&next=${encodeURIComponent(safeRedirect)}`, request.url));
+  const fail = (reason: string) => {
+    const response = NextResponse.redirect(new URL(`/sign-in?error=${encodeURIComponent(reason)}&next=${encodeURIComponent(safeRedirect)}`, request.url));
+    response.cookies.delete("max_oauth_state");
+    response.cookies.delete("max_oauth_verifier");
+    response.cookies.delete("max_oauth_next");
+    return response;
+  };
+
   if (error) return fail(error);
   if (!code || !state || !savedState || state !== savedState || !verifier) return fail("invalid_oauth_response");
 
@@ -26,21 +33,32 @@ export async function GET(request: Request) {
   const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || new URL("/auth/callback", request.url).toString();
   if (!clientId || clientId.startsWith("REPLACE_")) return fail("missing_client");
 
-  const tokenResponse = await fetch(`${authApi}/api/v1/oauth/token`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      grant_type: "authorization_code",
-      code,
-      client_id: clientId,
-      redirect_uri: redirectUri,
-      code_verifier: verifier,
-    }),
-    cache: "no-store",
-  });
+  let tokenResponse: Response;
+  try {
+    tokenResponse = await fetch(`${authApi}/api/v1/oauth/token`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        grant_type: "authorization_code",
+        code,
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        code_verifier: verifier,
+      }),
+      cache: "no-store",
+    });
+  } catch {
+    return fail("token_exchange_failed");
+  }
 
   if (!tokenResponse.ok) return fail("token_exchange_failed");
-  const token = await tokenResponse.json() as { access_token?: string; refresh_token?: string; expires_in?: number };
+
+  let token: { access_token?: string; refresh_token?: string; expires_in?: number };
+  try {
+    token = await tokenResponse.json() as { access_token?: string; refresh_token?: string; expires_in?: number };
+  } catch {
+    return fail("token_exchange_failed");
+  }
   if (!token.access_token || !token.refresh_token) return fail("missing_access_token");
 
   const response = NextResponse.redirect(new URL(safeRedirect, request.url));
