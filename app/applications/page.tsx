@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { AppWindow, KeyRound, Plus, Settings2, ShieldCheck, Trash2 } from "lucide-react";
+import { AppWindow, ExternalLink, KeyRound, RefreshCw, Settings2, ShieldCheck, Trash2 } from "lucide-react";
 
 type OAuthClient = {
   id: string;
@@ -62,9 +62,14 @@ export default function ApplicationsPage() {
         <header className="topbar"><div className="breadcrumb">Applications</div><div className="account"><div className="avatar">M</div></div></header>
         <main className="content">
           <div className="hero">
-            <div><div className="eyebrow">MAX Auth</div><h1>Applications</h1><p className="lead">Register and manage the applications that use MAX Account for sign-in.</p></div>
-            <Link className="primary" href="/applications/new"><Plus size={16} style={{verticalAlign:"-3px", marginRight:7}} />Create application</Link>
+            <div><div className="eyebrow">MAX Auth</div><h1>Applications</h1><p className="lead">Applications registered in MAX Auth are automatically available here.</p></div>
+            <div style={{display:"flex",gap:8,alignItems:"center"}}>
+              <button className="secondary" onClick={() => void load()} disabled={loading} title="Refresh applications"><RefreshCw size={15} style={{verticalAlign:"-2px",marginRight:6}} />{loading ? "Refreshing…" : "Refresh"}</button>
+              <a className="primary" href="https://auth.max-ai.name.ng/developer" target="_blank" rel="noreferrer"><ExternalLink size={15} style={{verticalAlign:"-2px",marginRight:6}} />Manage in MAX Auth</a>
+            </div>
           </div>
+
+          <section className="notice" style={{marginTop:20}}><ShieldCheck size={18}/><div><strong>MAX Auth is the source of truth</strong><p>Create, configure, and register OAuth clients in MAX Auth. This portal only reads your registered clients and provides the developer-facing view.</p></div></section>
 
           {error ? <div className="auth-error" role="alert">{error}</div> : null}
           {loading ? (
@@ -80,7 +85,7 @@ export default function ApplicationsPage() {
                     <div className="row-sub">Redirect: {client.redirectUris[0] || "—"}</div>
                   </div>
                   <span className="status" style={{opacity:client.isActive ? 1 : .55}}>{client.isActive ? "Active" : "Revoked"}</span>
-                  <Link className="icon-button" href={`/applications/${encodeURIComponent(client.id)}`} title="Manage application" aria-label={`Manage ${client.name}`}><Settings2 size={16}/></Link>
+                  <Link className="icon-button" href={`/applications/${encodeURIComponent(client.id)}`} title="View application" aria-label={`View ${client.name}`}><Settings2 size={16}/></Link>
                   {client.isActive ? <button className="icon-button" onClick={() => void revoke(client)} disabled={revoking === client.id} title="Revoke application" aria-label={`Revoke ${client.name}`}><Trash2 size={16}/></button> : null}
                 </div>
               ))}
@@ -88,9 +93,9 @@ export default function ApplicationsPage() {
           ) : (
             <section className="card" style={{padding:"48px 24px", textAlign:"center"}}>
               <div className="icon-box" style={{margin:"0 auto 16px", width:48, height:48}}><AppWindow size={21}/></div>
-              <h2 style={{margin:0, fontSize:17}}>No applications yet</h2>
-              <p className="card-desc" style={{maxWidth:430, margin:"8px auto 20px"}}>Create your first MAX application to receive an OAuth client ID and configure secure sign-in with MAX.</p>
-              <Link className="primary" href="/applications/new">Create your first application</Link>
+              <h2 style={{margin:0, fontSize:17}}>No MAX Auth applications yet</h2>
+              <p className="card-desc" style={{maxWidth:460, margin:"8px auto 20px"}}>Create an OAuth client in MAX Auth first. Once registered, it will appear here automatically after you refresh this page.</p>
+              <a className="primary" href="https://auth.max-ai.name.ng/developer" target="_blank" rel="noreferrer"><ExternalLink size={15} style={{verticalAlign:"-2px",marginRight:6}} />Open MAX Auth Developer</a>
             </section>
           )}
 
