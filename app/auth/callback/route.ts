@@ -35,16 +35,24 @@ export async function GET(request: Request) {
   });
 
   if (!tokenResponse.ok) return fail("token_exchange_failed");
-  const token = await tokenResponse.json() as { access_token?: string; expires_in?: number };
-  if (!token.access_token) return fail("missing_access_token");
+  const token = await tokenResponse.json() as { access_token?: string; refresh_token?: string; expires_in?: number };
+  if (!token.access_token || !token.refresh_token) return fail("missing_access_token");
 
   const response = NextResponse.redirect(new URL(safeNext, request.url));
+  const secure = process.env.NODE_ENV === "production";
   response.cookies.set("max_access_token", token.access_token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure,
     sameSite: "lax",
     path: "/",
     maxAge: Math.max(60, token.expires_in ?? 3600),
+  });
+  response.cookies.set("max_refresh_token", token.refresh_token, {
+    httpOnly: true,
+    secure,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 30 * 24 * 60 * 60,
   });
   response.cookies.delete("max_oauth_state");
   response.cookies.delete("max_oauth_verifier");
