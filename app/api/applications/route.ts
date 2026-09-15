@@ -1,4 +1,4 @@
-import { authFetch } from "@/lib/auth-session";
+import { authFetch } from "../../../lib/auth-session";
 
 export async function GET() { return authFetch(""); }
 
