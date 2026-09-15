@@ -6,6 +6,7 @@ const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID;
 
 const accessCookie = "max_access_token";
 const refreshCookie = "max_refresh_token";
+const expiryCookie = "max_access_expires_at";
 
 function cookieOptions(maxAge: number) {
   return {
@@ -50,7 +51,9 @@ async function refreshSession(jar: Awaited<ReturnType<typeof cookies>>) {
 
   if (!token?.access_token) return null;
 
-  jar.set(accessCookie, token.access_token, cookieOptions(Math.max(60, token.expires_in ?? 3600)));
+  const accessMaxAge = Math.max(60, token.expires_in ?? 3600);
+  jar.set(accessCookie, token.access_token, cookieOptions(accessMaxAge));
+  jar.set(expiryCookie, String(Date.now() + accessMaxAge * 1000), cookieOptions(accessMaxAge));
   if (token.refresh_token) jar.set(refreshCookie, token.refresh_token, cookieOptions(30 * 24 * 60 * 60));
   return token.access_token;
 }
@@ -84,4 +87,5 @@ export async function clearSession() {
   const jar = await cookies();
   jar.delete(accessCookie);
   jar.delete(refreshCookie);
+  jar.delete(expiryCookie);
 }
