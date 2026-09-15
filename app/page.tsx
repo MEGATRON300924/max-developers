@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Activity, AppWindow, BookOpen, Boxes, ChevronRight, Code2, ExternalLink, FileKey2, Gauge, LayoutDashboard, LifeBuoy, LockKeyhole, Settings, ShieldCheck, Webhook } from "lucide-react";
+import { Activity, AppWindow, BookOpen, Boxes, ChevronRight, Code2, ExternalLink, FileKey2, Gauge, KeyRound, LayoutDashboard, LifeBuoy, LockKeyhole, Settings, ShieldCheck, Webhook } from "lucide-react";
 import { getMaxUser } from "./lib/auth";
 
 const nav = [
