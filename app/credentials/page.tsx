@@ -39,17 +39,17 @@ export default function CredentialsPage() {
 
           <section className="grid" style={{marginTop:28}}>
             <div className="card"><KeyRound color="var(--blue)" size={20}/><h2 className="card-title" style={{marginTop:14}}>OAuth applications</h2><p className="card-desc">Client IDs and OAuth configuration for MAX Auth applications.</p><div className="metric" style={{fontSize:22}}>{loading ? "—" : active.length}</div><div className="metric-note">active applications</div></div>
-            <div className="card"><FileKey2 color="var(--blue)" size={20}/><h2 className="card-title" style={{marginTop:14}}>API keys</h2><p className="card-desc">API credentials for MAX services will be managed here.</p><div className="metric" style={{fontSize:22}}>Coming soon</div></div>
-            <div className="card"><ShieldCheck color="var(--blue)" size={20}/><h2 className="card-title" style={{marginTop:14}}>Webhook secrets</h2><p className="card-desc">Signing secrets for trusted MAX events will be managed here.</p><div className="metric" style={{fontSize:22}}>Coming soon</div></div>
+            <div className="card"><FileKey2 color="var(--blue)" size={20}/><h2 className="card-title" style={{marginTop:14}}>API keys</h2><p className="card-desc">API credentials for MAX services will be managed here once the MAX service API authentication layer is available.</p><div className="metric" style={{fontSize:22}}>Coming soon</div></div>
+            <div className="card"><ShieldCheck color="var(--blue)" size={20}/><h2 className="card-title" style={{marginTop:14}}>Webhook secrets</h2><p className="card-desc">Signing secrets for trusted MAX events will be managed here when webhook delivery is enabled.</p><div className="metric" style={{fontSize:22}}>Coming soon</div></div>
           </section>
 
           <section className="section">
-            <div className="section-head"><div><h2 className="section-title">OAuth client IDs</h2><p className="section-desc">Client IDs are public identifiers. Public PKCE clients do not have a client secret.</p></div></div>
+            <div className="section-head"><div><h2 className="section-title">OAuth credentials</h2><p className="section-desc">Public clients use PKCE. Confidential clients have a server-side secret that can be rotated from their application settings.</p></div></div>
             <div className="card list">
               {loading ? <div className="list-row"><div className="row-main"><div className="row-sub">Loading credentials…</div></div></div> : active.length ? active.map((client) => (
                 <div className="list-row" key={client.id}>
                   <div className="icon-box"><KeyRound size={18}/></div>
-                  <div className="row-main"><div className="row-title">{client.name}</div><div className="row-sub" style={{fontFamily:"monospace"}}>{client.clientId}</div></div>
+                  <div className="row-main"><div className="row-title">{client.name}</div><div className="row-sub" style={{fontFamily:"monospace"}}>{client.clientId}</div><div className="row-sub">{client.isConfidential ? "Confidential OAuth client" : "Public PKCE OAuth client"}</div></div>
                   <Link className="secondary" href={`/applications/${encodeURIComponent(client.id)}`}>Manage <ArrowRight size={13} style={{verticalAlign:"-2px",marginLeft:5}}/></Link>
                 </div>
               )) : <div style={{padding:"28px 18px",color:"var(--muted)",fontSize:12}}>No active OAuth applications. <Link href="/applications/new" style={{color:"var(--blue)",fontWeight:700}}>Create one</Link>.</div>}
@@ -57,7 +57,7 @@ export default function CredentialsPage() {
           </section>
 
           <section className="card" style={{marginTop:16}}>
-            <div className="notice" style={{border:0,padding:0,background:"transparent"}}><ShieldCheck size={18}/><div><strong>Keep your OAuth flow secure</strong><p>Browser and mobile applications should use Authorization Code + S256 PKCE. Never put a confidential client secret in frontend code, source control, or a mobile bundle.</p></div></div>
+            <div className="notice" style={{border:0,padding:0,background:"transparent"}}><ShieldCheck size={18}/><div><strong>Keep your OAuth flow secure</strong><p>Browser and mobile applications should use Authorization Code + S256 PKCE. Confidential client secrets belong only on trusted servers and should never be committed to source control or shipped in frontend/mobile bundles.</p></div></div>
           </section>
           <div className="footer"><Link href="/">← Back to dashboard</Link></div>
         </main>
