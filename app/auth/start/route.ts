@@ -32,7 +32,10 @@ export async function GET(request: Request) {
   url.searchParams.set("client_id", clientId);
   url.searchParams.set("redirect_uri", redirectUri);
   url.searchParams.set("response_type", "code");
-  url.searchParams.set("scope", "openid profile email");
+  // The developer platform only needs the MAX access token and user profile/email.
+  // Do not request OIDC's `openid` scope here because that requires MAX Auth to
+  // have an OIDC signing key configured in production in order to mint an ID token.
+  url.searchParams.set("scope", "profile email");
   url.searchParams.set("code_challenge", challenge);
   url.searchParams.set("code_challenge_method", "S256");
   url.searchParams.set("state", state);
