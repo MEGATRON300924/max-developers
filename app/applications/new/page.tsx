@@ -8,8 +8,6 @@ type CreatedClient = { client?: { clientId?: string; name?: string; redirectUris
 
 export default function NewApplicationPage() {
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [website, setWebsite] = useState("");
   const [redirectUri, setRedirectUri] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +34,7 @@ export default function NewApplicationPage() {
       const data = await response.json() as CreatedClient & { message?: string };
       if (!response.ok) throw new Error(data.message || "Unable to create application.");
       setCreated(data);
-      setName(""); setDescription(""); setWebsite(""); setRedirectUri("");
+      setName(""); setRedirectUri("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to create application.");
     } finally { setCreating(false); }
@@ -78,9 +76,7 @@ export default function NewApplicationPage() {
             <form onSubmit={createApplication} className="card" style={{marginTop:28,maxWidth:760}}>
               <div style={{display:"grid",gap:18}}>
                 <label className="field-label">Application name<input value={name} onChange={(e) => setName(e.target.value)} placeholder="My MAX App" style={inputStyle} required /></label>
-                <label className="field-label">Description<span className="field-help">Optional internal description for this application.</span><textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="A short description" style={{...inputStyle,minHeight:90,resize:"vertical"}}/></label>
-                <label className="field-label">Website URL<span className="field-help">Optional. This is for your application information page.</span><input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://example.com" style={inputStyle}/></label>
-                <label className="field-label">Redirect URI<span className="field-help">MAX Auth returns users to this exact URL after authorization.</span><input value={redirectUri} onChange={(e) => setRedirectUri(e.target.value)} placeholder="https://example.com/auth/callback" style={inputStyle} required /></label>
+                <label className="field-label">Redirect URI<span className="field-help">MAX Auth returns users to this exact URL after authorization. Add HTTPS for production; localhost is allowed for development.</span><input value={redirectUri} onChange={(e) => setRedirectUri(e.target.value)} placeholder="https://example.com/auth/callback" style={inputStyle} required /></label>
                 <div className="notice"><KeyRound size={18}/><div><strong>Public PKCE application</strong><p>Recommended for browser and mobile applications. Authorization Code + S256 PKCE is used, so no client secret is required in the app.</p></div></div>
                 <div style={{display:"flex",gap:10,justifyContent:"flex-end",paddingTop:4}}><Link href="/applications" className="secondary">Cancel</Link><button disabled={creating} className="primary" type="submit">{creating ? "Creating…" : "Create application"}</button></div>
               </div>
