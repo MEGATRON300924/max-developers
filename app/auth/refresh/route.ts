@@ -11,7 +11,7 @@ function safeNext(value: string | null) {
 export async function GET(request: Request) {
   const incoming = new URL(request.url);
   const next = safeNext(incoming.searchParams.get("next"));
-  const refreshToken = incoming.searchParams.get("refresh") || request.headers.get("cookie")?.match(/(?:^|;\s*)max_refresh_token=([^;]+)/)?.[1];
+  const refreshToken = request.headers.get("cookie")?.match(/(?:^|;\s*)max_refresh_token=([^;]+)/)?.[1];
 
   if (!refreshToken || !clientId) {
     const response = NextResponse.redirect(new URL(`/sign-in?next=${encodeURIComponent(next)}`, request.url));
