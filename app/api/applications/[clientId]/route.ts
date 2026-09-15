@@ -39,3 +39,8 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
   const { clientId } = await params;
   return authFetch(`/${encodeURIComponent(clientId)}`, { method: "DELETE" });
 }
+
+export async function POST(_request: Request, { params }: { params: Promise<{ clientId: string }> }) {
+  const { clientId } = await params;
+  return authFetch(`/${encodeURIComponent(clientId)}/rotate-secret`, { method: "POST", body: JSON.stringify({}) });
+}
