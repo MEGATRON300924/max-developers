@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { authFetch } from "@/lib/auth-session";
+import { authFetch } from "../../../../lib/auth-session";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ clientId: string }> }) {
   const { clientId } = await params;
