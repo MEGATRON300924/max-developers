@@ -8,7 +8,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    return authFetchPath("webhooks", { method: "POST", body: JSON.stringify(body) });
+    return authFetchPath("webhooks", "", { method: "POST", body: JSON.stringify(body) });
   } catch {
     return NextResponse.json({ message: "Invalid JSON body" }, { status: 400 });
   }
