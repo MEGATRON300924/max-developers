@@ -1,6 +1,8 @@
 export type MaxClientOptions = {
   baseUrl?: string;
   accessToken?: string;
+  clientId?: string;
+  clientSecret?: string;
   fetch?: typeof globalThis.fetch;
 };
 
@@ -23,11 +25,15 @@ export class MaxApiError extends Error {
 export class MaxClient {
   private readonly baseUrl: string;
   private readonly accessToken?: string;
+  private readonly clientId?: string;
+  private readonly clientSecret?: string;
   private readonly requestFetch: typeof globalThis.fetch;
 
   constructor(options: MaxClientOptions = {}) {
     this.baseUrl = (options.baseUrl ?? "https://auth.max-ai.name.ng/api/v1").replace(/\/$/, "");
     this.accessToken = options.accessToken;
+    this.clientId = options.clientId;
+    this.clientSecret = options.clientSecret;
     this.requestFetch = options.fetch ?? globalThis.fetch;
     if (!this.requestFetch) throw new Error("A fetch implementation is required");
   }
@@ -42,6 +48,10 @@ export class MaxClient {
       headers,
       body: options.body === undefined ? undefined : JSON.stringify(options.body),
     });
+    return this.parseResponse<T>(response);
+  }
+
+  private async parseResponse<T>(response: Response): Promise<T> {
     const text = await response.text();
     let data: unknown = null;
     try { data = text ? JSON.parse(text) : null; } catch { data = text; }
@@ -52,9 +62,29 @@ export class MaxClient {
     return data as T;
   }
 
+  private clientCredentialsBody() {
+    if (!this.clientId) throw new Error("clientId is required for this OAuth operation");
+    return {
+      client_id: this.clientId,
+      ...(this.clientSecret ? { client_secret: this.clientSecret } : {}),
+    };
+  }
+
   userinfo<T = Record<string, unknown>>() { return this.request<T>("oauth/userinfo"); }
-  introspect<T = Record<string, unknown>>(token: string) { return this.request<T>("oauth/introspect", { method: "POST", body: { token } }); }
-  revoke<T = Record<string, unknown>>(token: string) { return this.request<T>("oauth/revoke", { method: "POST", body: { token } }); }
+
+  introspect<T = Record<string, unknown>>(token: string) {
+    return this.request<T>("oauth/introspect", {
+      method: "POST",
+      body: { token },
+    });
+  }
+
+  revoke<T = Record<string, unknown>>(token: string) {
+    return this.request<T>("oauth/revoke", {
+      method: "POST",
+      body: { token, ...this.clientCredentialsBody() },
+    });
+  }
 }
 
 export default MaxClient;
