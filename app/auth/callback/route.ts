@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
+const DEFAULT_MAX_CLIENT_ID = "max_client_cUC9DEVSPgxp8kh7";
+
 function safeNext(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/";
   return value;
@@ -28,10 +30,9 @@ export async function GET(request: Request) {
   if (error) return fail(error);
   if (!code || !state || !savedState || state !== savedState || !verifier) return fail("invalid_oauth_response");
 
-  const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID;
+  const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID || DEFAULT_MAX_CLIENT_ID;
   const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.name.ng";
   const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || new URL("/auth/callback", request.url).toString();
-  if (!clientId || clientId.startsWith("REPLACE_")) return fail("missing_client");
 
   let tokenResponse: Response;
   try {
@@ -64,27 +65,9 @@ export async function GET(request: Request) {
   const response = NextResponse.redirect(new URL(safeRedirect, request.url));
   const secure = process.env.NODE_ENV === "production";
   const accessMaxAge = Math.max(60, token.expires_in ?? 3600);
-  response.cookies.set("max_access_token", token.access_token, {
-    httpOnly: true,
-    secure,
-    sameSite: "lax",
-    path: "/",
-    maxAge: accessMaxAge,
-  });
-  response.cookies.set("max_access_expires_at", String(Date.now() + accessMaxAge * 1000), {
-    httpOnly: true,
-    secure,
-    sameSite: "lax",
-    path: "/",
-    maxAge: accessMaxAge,
-  });
-  response.cookies.set("max_refresh_token", token.refresh_token, {
-    httpOnly: true,
-    secure,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 30 * 24 * 60 * 60,
-  });
+  response.cookies.set("max_access_token", token.access_token, { httpOnly: true, secure, sameSite: "lax", path: "/", maxAge: accessMaxAge });
+  response.cookies.set("max_access_expires_at", String(Date.now() + accessMaxAge * 1000), { httpOnly: true, secure, sameSite: "lax", path: "/", maxAge: accessMaxAge });
+  response.cookies.set("max_refresh_token", token.refresh_token, { httpOnly: true, secure, sameSite: "lax", path: "/", maxAge: 30 * 24 * 60 * 60 });
   response.cookies.delete("max_oauth_state");
   response.cookies.delete("max_oauth_verifier");
   response.cookies.delete("max_oauth_next");
