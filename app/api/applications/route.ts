@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { authFetch } from "@/lib/auth-session";
 
 export async function GET() { return authFetch(""); }
