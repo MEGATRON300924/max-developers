@@ -15,13 +15,15 @@ type OAuthClient = {
 };
 
 const scopeLabels: Record<string, string> = {
-  openid: "OpenID Connect",
-  profile: "Basic profile",
+  openid: "MAX account identity",
+  profile: "Basic profile information",
   email: "Email address",
-  offline_access: "Refresh tokens",
-  "profile:read": "Profile read access",
-  "email:read": "Email read access",
-  "account:read": "Account read access",
+  offline_access: "Stay signed in with refresh tokens",
+  "identity:read": "MAX user ID",
+  "profile:read": "Basic profile information",
+  "email:read": "Email address and verification state",
+  "memory:read": "Approved MAX Memory data",
+  "account:read": "MAX account information",
 };
 
 export default function ApplicationDetailsPage({ params }: { params: Promise<{ clientId: string }> }) {
@@ -163,9 +165,9 @@ export default function ApplicationDetailsPage({ params }: { params: Promise<{ c
                     {client.isActive ? <button className="secondary" type="button" onClick={addRedirect} style={{marginTop:9}}>+ Add redirect URI</button> : null}
                   </div>
 
-                  <div className="field-label">Allowed scopes<span className="field-help">Scopes can only be reduced from the permissions already registered for this application.</span>
+                  <div className="field-label">Allowed permissions<span className="field-help">These are the permissions this application can request during MAX sign-in.</span>
                     <div className="scope-grid">
-                      {availableScopes.map((scope) => <label className="scope-option" key={scope}><input type="checkbox" checked={scopes.includes(scope)} onChange={() => toggleScope(scope)} disabled={!client.isActive}/><span><strong>{scope}</strong><small>{scopeLabels[scope] || "MAX OAuth permission"}</small></span></label>)}
+                      {availableScopes.map((scope) => <label className="scope-option" key={scope}><input type="checkbox" checked={scopes.includes(scope)} onChange={() => toggleScope(scope)} disabled={!client.isActive}/><span><strong>{scopeLabels[scope] || scope}</strong><small>{scope}</small></span></label>)}
                     </div>
                   </div>
 
