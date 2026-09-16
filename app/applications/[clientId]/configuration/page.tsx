@@ -7,7 +7,17 @@ import { ArrowLeft, Check, ExternalLink, Globe2, Save, ShieldCheck, Smartphone, 
 type OAuthClient = { id: string; clientId: string; name: string; redirectUris: string[]; scopes: string[]; isActive: boolean };
 type Config = { applicationType: "WEB" | "SPA" | "ANDROID" | "IOS" | "DESKTOP"; authorizedOrigins: string[]; packageName: string | null; bundleId: string | null; certificateFingerprints: string[]; logoUrl: string | null; hasLogoUpload?: boolean; displayName: string | null; websiteUrl: string | null; manifestUrl: string | null; verificationStatus: string; verifiedAt: string | null };
 
-const permissions = [["identity:read", "User ID", "Identify the signed-in MAX account."],["profile:read", "Basic profile", "Name, username and profile picture."],["email:read", "Email address", "Email and verification state."],["memory:read", "MAX Memory", "Read memory data approved by the user."],["offline_access", "Stay signed in", "Use refresh tokens for longer sessions."]] as const;
+const permissions = [
+  ["openid", "Sign in with MAX", "Use the MAX account identity to sign the user in."],
+  ["profile", "Basic profile", "Request the user's basic MAX profile."],
+  ["email", "Email address", "Request the user's email address and verification state."],
+  ["account:read", "MAX account", "Read information about the user's MAX account."],
+  ["identity:read", "User ID", "Identify the signed-in MAX account."],
+  ["profile:read", "Profile details", "Read the user's name, username and profile picture."],
+  ["email:read", "Email details", "Read the user's email address and verification state."],
+  ["memory:read", "MAX Memory", "Read MAX Memory data approved by the user."],
+  ["offline_access", "Stay signed in", "Allow refresh tokens for longer sessions."]
+] as const;
 const types = { WEB: ["Web application", Globe2], SPA: ["Single-page app", Globe2], ANDROID: ["Android app", Smartphone], IOS: ["iPhone & iPad app", Apple], DESKTOP: ["Desktop app", Monitor] } as const;
 const inputStyle: React.CSSProperties = { width: "100%", marginTop: 7, border: "1px solid var(--border)", borderRadius: 12, background: "var(--surface)", color: "var(--text)", padding: "12px 13px", outline: "none", fontSize: 12 };
 
