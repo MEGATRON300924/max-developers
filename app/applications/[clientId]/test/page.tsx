@@ -21,6 +21,7 @@ const labels: Record<string, [string, string]> = {
   "profile:read": ["Basic profile", "Read the user's basic MAX profile."],
   "email:read": ["Email address", "Read the user's email and verification state."],
   "memory:read": ["MAX Memory", "Request the MAX Memory data approved by the user."],
+  "account:read": ["MAX account", "Read information about the user's MAX account."],
   offline_access: ["Stay signed in", "Request a refresh token for longer sessions."],
   openid: ["MAX account identity", "Request OpenID-compatible identity claims."],
   profile: ["Basic profile", "Request basic profile claims."],
