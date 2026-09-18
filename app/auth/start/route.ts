@@ -15,7 +15,7 @@ function safeNext(value: string | null) {
 
 export async function GET(request: Request) {
   const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID || DEFAULT_MAX_CLIENT_ID;
-  const authFrontend = process.env.NEXT_PUBLIC_MAX_AUTH_FRONTEND_URL || "https://api.max-ai.name.ng";
+  const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.name.ng";
   const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || "https://developers.max-ai.name.ng/auth/callback";
   const incoming = new URL(request.url);
   const safeRedirect = safeNext(incoming.searchParams.get("next"));
@@ -30,7 +30,7 @@ export async function GET(request: Request) {
   jar.set("max_oauth_verifier", verifier, { httpOnly: true, secure, sameSite: "lax", path: "/auth", maxAge: 600 });
   jar.set("max_oauth_next", safeRedirect, { httpOnly: true, secure, sameSite: "lax", path: "/auth", maxAge: 600 });
 
-  const url = new URL(`${authFrontend}/authorize`);
+  const url = new URL(`${authApi}/api/v1/oauth/authorize`);
   url.searchParams.set("client_id", clientId);
   url.searchParams.set("redirect_uri", redirectUri);
   url.searchParams.set("response_type", "code");
