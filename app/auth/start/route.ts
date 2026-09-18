@@ -15,7 +15,7 @@ function safeNext(value: string | null) {
 
 export async function GET(request: Request) {
   const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID || DEFAULT_MAX_CLIENT_ID;
-  const authFrontend = process.env.NEXT_PUBLIC_MAX_AUTH_FRONTEND_URL || "https://api.max-ai.name.ng";
+  const authFrontend = process.env.NEXT_PUBLIC_MAX_AUTH_FRONTEND_URL || "https://auth.max-ai.name.ng";
   const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || "https://developers.max-ai.name.ng/auth/callback";
   const incoming = new URL(request.url);
   const safeRedirect = safeNext(incoming.searchParams.get("next"));
