@@ -2,8 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Activity, AppWindow, ArrowUpRight, BookOpen, Boxes, CheckCircle2, ChevronRight, Code2, ExternalLink, FileKey2, Gauge, LayoutDashboard, Settings, ShieldCheck, Webhook, SlidersHorizontal } from "lucide-react";
 import { cookies } from "next/headers";
-import { getMaxUser } from "./lib/auth";
-import UsageCard from "./components/usage-card";
+import { getMaxUser } from "../lib/auth";
+import UsageCard from "../components/usage-card";
 
 type OAuthClient = { id: string; clientId: string; name: string; redirectUris: string[]; scopes: string[]; isActive: boolean };
 const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.name.ng";
