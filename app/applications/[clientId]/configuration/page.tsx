@@ -44,10 +44,10 @@ export default function ConfigurationPage({ params }: { params: Promise<{ client
       }
       const scopeResponse = await fetch(`/api/applications/${encodeURIComponent(client.id)}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ scopes: cleanScopes }) });
       const sd = await scopeResponse.json();
-      if (!scopeResponse.ok) throw new Error(sd.message || sd.error?.message || (sd.error?.details?.map((d: {path?: string; message?: string}) => `${d.path || "field"}: ${d.message || "invalid"}`).join("; ")) || "Unable to save permissions."));
+      if (!scopeResponse.ok) throw new Error(sd.message || sd.error?.message || (sd.error?.details?.map((d: {path?: string; message?: string}) => `${d.path || "field"}: ${d.message || "invalid"}`).join("; ")) || "Unable to save permissions.");
       const configResponse = await fetch(`/api/applications/${encodeURIComponent(client.id)}/config`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ applicationType: config.applicationType, authorizedOrigins: cleanOrigins, packageName: config.packageName || undefined, bundleId: config.bundleId || undefined, certificateFingerprints: config.certificateFingerprints.map((v) => v.trim()).filter(Boolean), logoUrl: config.logoUrl || null, displayName: config.displayName || null, websiteUrl: config.websiteUrl || null, manifestUrl: config.manifestUrl || null }) });
       const cd = await configResponse.json();
-      if (!configResponse.ok) throw new Error(cd.message || cd.error?.message || (cd.error?.details?.map((d: {path?: string; message?: string}) => `${d.path || "field"}: ${d.message || "invalid"}`).join("; ")) || "Unable to save configuration."));
+      if (!configResponse.ok) throw new Error(cd.message || cd.error?.message || (cd.error?.details?.map((d: {path?: string; message?: string}) => `${d.path || "field"}: ${d.message || "invalid"}`).join("; ")) || "Unable to save configuration.");
       setConfig(cd.config); setScopes(sd.client?.scopes || cleanScopes); setSaved(true);
     } catch (e) { setError(e instanceof Error ? e.message : "Unable to save configuration."); } finally { setSaving(false); }
   }
