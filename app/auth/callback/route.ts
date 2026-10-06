@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-const DEFAULT_MAX_CLIENT_ID = "max_client_cLOwocPIO2MWjBXC";
+const DEFAULT_MAX_CLIENT_ID = "max_client_llITDlGy6a2tSJBX";
 
 function safeNext(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/dashboard";
