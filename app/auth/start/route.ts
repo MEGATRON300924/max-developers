@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import crypto from "node:crypto";
 
-const DEFAULT_MAX_CLIENT_ID = "max_client_cLOwocPIO2MWjBXC";
+const DEFAULT_MAX_CLIENT_ID = "max_client_llITDlGy6a2tSJBX";
 
 function base64url(input: Buffer) {
   return input.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
