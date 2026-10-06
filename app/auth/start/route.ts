@@ -29,7 +29,7 @@ export async function GET(request: Request) {
   url.searchParams.set("client_id", clientId);
   url.searchParams.set("redirect_uri", redirectUri);
   url.searchParams.set("response_type", "code");
-  url.searchParams.set("scope", "profile email offline_access");
+  url.searchParams.set("scope", "openid profile email offline_access profile:read email:read account:read identity:read memory:read");
   url.searchParams.set("code_challenge", challenge);
   url.searchParams.set("code_challenge_method", "S256");
   url.searchParams.set("state", state);
