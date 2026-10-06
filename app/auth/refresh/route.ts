@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.name.ng";
-const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID || "max_client_cLOwocPIO2MWjBXC";
+const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID || "max_client_llITDlGy6a2tSJBX";
 function safeNext(value: string | null) { if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/"; return value; }
 function getCookie(request: Request, name: string) { const cookieHeader = request.headers.get("cookie") || ""; const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${name}=([^;]*)`)); if (!match) return null; try { return decodeURIComponent(match[1]); } catch { return null; } }
 export async function GET(request: Request) {
