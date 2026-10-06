@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.name.ng";
-const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID || "max_client_cLOwocPIO2MWjBXC";
+const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID || "max_client_llITDlGy6a2tSJBX";
 const accessCookie = "max_access_token"; const refreshCookie = "max_refresh_token"; const expiryCookie = "max_access_expires_at";
 function cookieOptions(maxAge: number) { return { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" as const, path: "/", maxAge }; }
 async function parseResponse(response: Response) { const text = await response.text(); try { return text ? JSON.parse(text) : null; } catch { return { message: text || "Request failed" }; } }
