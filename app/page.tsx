@@ -11,7 +11,8 @@ export default function LandingPage() {
         </Link>
         <div className="landing-nav-actions">
           <Link href="/documentation" className="landing-link">Documentation</Link>
-          <Link href="/sign-in?next=%2Fonboarding" className="secondary">Sign in</Link>\n          <Link href="https://api.max-ai.name.ng/create-account?returnTo=https%3A%2F%2Fdevelopers.max-ai.name.ng%2Fsign-in%3Fnext%3D%252Fonboarding" className="primary">Create account</Link>
+          <Link href="/sign-in?next=%2Fonboarding" className="secondary">Sign in</Link>
+          <Link href="https://api.max-ai.name.ng/create-account?returnTo=https%3A%2F%2Fdevelopers.max-ai.name.ng%2Fsign-in%3Fnext%3D%252Fonboarding" className="primary">Create account</Link>
         </div>
       </nav>
 
