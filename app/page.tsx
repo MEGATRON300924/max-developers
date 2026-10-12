@@ -11,7 +11,7 @@ export default function LandingPage() {
         </Link>
         <div className="landing-nav-actions">
           <Link href="/documentation" className="landing-link">Documentation</Link>
-          <Link href="/sign-in" className="secondary">Sign in</Link>
+          <Link href="/sign-in?next=%2Fonboarding" className="secondary">Sign in</Link>\n          <Link href="https://api.max-ai.name.ng/create-account?returnTo=https%3A%2F%2Fdevelopers.max-ai.name.ng%2Fsign-in%3Fnext%3D%252Fonboarding" className="primary">Create account</Link>
         </div>
       </nav>
 
@@ -20,7 +20,7 @@ export default function LandingPage() {
         <h1>Build the future with <span>MAX.</span></h1>
         <p>One developer platform for building secure applications and integrations across the MAX AI Ecosystem.</p>
         <div className="landing-actions">
-          <Link href="/sign-in" className="primary">Start building <ArrowRight size={16}/></Link>
+          <Link href="/sign-in?next=%2Fonboarding" className="primary">Start building <ArrowRight size={16}/></Link>
           <Link href="/documentation" className="secondary">Read the docs</Link>
         </div>
         <div className="landing-code">
@@ -40,7 +40,7 @@ export default function LandingPage() {
 
       <section className="landing-cta">
         <div><div className="eyebrow">Ready when you are</div><h2>Start building with MAX.</h2><p>Create your developer session with your MAX Account.</p></div>
-        <Link href="/sign-in" className="primary">Continue with MAX <ArrowRight size={16}/></Link>
+        <Link href="/sign-in?next=%2Fonboarding" className="primary">Continue with MAX <ArrowRight size={16}/></Link>
       </section>
 
       <footer className="landing-footer">MAX Developer Platform · The MAX AI Ecosystem · <Link href="https://max-ai.name.ng" target="_blank">MAX AI</Link></footer>
