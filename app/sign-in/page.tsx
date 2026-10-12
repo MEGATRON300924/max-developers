@@ -16,7 +16,9 @@ export default async function SignInPage({
   const params = await searchParams;
   const error = params.error ? errors[params.error] || "Sign-in could not be completed. Please try again." : null;
   const next = params.next && params.next.startsWith("/") && !params.next.startsWith("//") ? params.next : "/onboarding";
-  const signInHref = `/auth/start?next=${encodeURIComponent(next)}`;\n  const returnTo = "https://developers.max-ai.name.ng/sign-in?next=%2Fonboarding";\n  const signUpHref = `https://api.max-ai.name.ng/create-account?returnTo=${encodeURIComponent(returnTo)}`;
+  const signInHref = `/auth/start?next=${encodeURIComponent(next)}`;
+  const returnTo = "https://developers.max-ai.name.ng/sign-in?next=%2Fonboarding";
+  const signUpHref = `https://api.max-ai.name.ng/create-account?returnTo=${encodeURIComponent(returnTo)}`;
 
   return (
     <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 24, background: "var(--bg)" }}>
@@ -33,7 +35,8 @@ export default async function SignInPage({
         <a href={signInHref} className="primary" style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
           Continue with MAX Account <ArrowRight size={16} />
         </a>
-        <p style={{ marginTop: 20, color: "var(--muted)", fontSize: 12 }}>New to MAX? <a href={signUpHref} style={{ color: "var(--blue-strong)", fontWeight: 700 }}>Create a MAX Account</a></p>\n        <div style={{ marginTop: 22, color: "var(--muted)", fontSize: 11, display: "flex", justifyContent: "center", gap: 6, alignItems: "center" }}>
+        <p style={{ marginTop: 20, color: "var(--muted)", fontSize: 12 }}>New to MAX? <a href={signUpHref} style={{ color: "var(--blue-strong)", fontWeight: 700 }}>Create a MAX Account</a></p>
+        <div style={{ marginTop: 22, color: "var(--muted)", fontSize: 11, display: "flex", justifyContent: "center", gap: 6, alignItems: "center" }}>
           <ShieldCheck size={14} /> Secure authentication through MAX Auth
         </div>
         <div className="footer"><Link href="/">Return to Developer Platform</Link></div>
