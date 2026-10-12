@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 const DEFAULT_MAX_CLIENT_ID = "max_client_llITDlGy6a2tSJBX";
 
 function safeNext(value: string | null) {
-  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/dashboard";
+  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/onboarding";
   return value;
 }
 export async function GET(request: Request) {
