@@ -60,7 +60,7 @@ export default function CredentialsPage() {
       token_uri: "https://auth.max-ai.name.ng/api/v1/oauth/token",
       issuer: "https://auth.max-ai.name.ng",
       redirect_uris: credential.redirectUris,
-      note: "Keep this file private. MAX Auth will not show this client secret again. If it is lost, rotate the secret and download a new file."
+      note: "Keep this file private. MAX Auth will not show this client secret again. If it is lost, reset the secret and download a new file."
     };
     const blob = new Blob([JSON.stringify(payload, null, 2) + "\n"], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -75,7 +75,7 @@ export default function CredentialsPage() {
 
   async function rotateSecret(client: OAuthClient) {
     if (!client.isConfidential) return;
-    if (!window.confirm("Rotate the client secret for “" + client.name + "”? The current secret will stop working immediately. Only continue if you can update every server that uses it.")) return;
+    if (!window.confirm("Reset the client secret for “" + client.name + "”? The current secret will stop working immediately. Only continue if you can update every server that uses it.")) return;
     setRotating(client.id);
     setError(null);
     setGeneratedCredential(null);
@@ -139,7 +139,7 @@ export default function CredentialsPage() {
                   <button className="secondary" onClick={() => downloadCredentialFile(generatedCredential)}><Download size={14}/> Download JSON</button>
                 </div>
                 <p className="card-desc" style={{marginTop:10}}>Client ID: <code>{generatedCredential.clientId}</code></p>
-                <p className="card-desc" style={{marginTop:4}}>Dismiss this panel after saving the file. The secret cannot be retrieved again; rotate it if you lose it.</p>
+                <p className="card-desc" style={{marginTop:4}}>Dismiss this panel after saving the file. The secret cannot be retrieved again; reset it if you lose it.</p>
               </div>
             </div>
           </section> : null}
@@ -153,7 +153,7 @@ export default function CredentialsPage() {
                   <div className="row-main"><div className="row-title">{client.name}</div><div className="row-sub" style={{fontFamily:"monospace"}}>{client.clientId}</div><div className="row-sub">{client.isConfidential ? "Confidential · client secret enabled" : "Public · S256 PKCE"}</div></div>
                   <div style={{display:"flex",gap:8,alignItems:"center"}}>
                     <button className="icon-button" onClick={() => void copyClientId(client.clientId)} title="Copy client ID" aria-label="Copy client ID">{copied === client.clientId ? <Check size={15}/> : <KeyRound size={15}/>}</button>
-                    {client.isConfidential ? <button className="secondary" onClick={() => void rotateSecret(client)} disabled={rotating === client.id} title="Rotate client secret"><RotateCcw size={14}/>{rotating === client.id ? "Rotating…" : "Rotate secret"}</button> : null}
+                    {client.isConfidential ? <button className="secondary" onClick={() => void rotateSecret(client)} disabled={rotating === client.id} title="Rotate client secret"><RotateCcw size={14}/>{rotating === client.id ? "Resetting…" : "Reset Secret"}</button> : null}
                     <Link className="secondary" href={"/applications/" + encodeURIComponent(client.id)}>Manage <ArrowRight size={13} style={{verticalAlign:"-2px",marginLeft:5}}/></Link>
                   </div>
                 </div>
@@ -162,7 +162,7 @@ export default function CredentialsPage() {
           </section>
 
           <section className="card" style={{marginTop:16}}>
-            <div className="notice" style={{border:0,padding:0,background:"transparent"}}><ShieldCheck size={18}/><div><strong>Credential security</strong><p>Public clients should use Authorization Code + S256 PKCE. Confidential client secrets belong only on trusted servers. MAX Auth stores client secrets as hashes, so the portal cannot display an existing secret. Rotating a secret invalidates the previous one immediately.</p></div></div>
+            <div className="notice" style={{border:0,padding:0,background:"transparent"}}><ShieldCheck size={18}/><div><strong>Credential security</strong><p>Public clients should use Authorization Code + S256 PKCE. Confidential client secrets belong only on trusted servers. MAX Auth stores client secrets as hashes, so the portal cannot display an existing secret. Resetting a secret invalidates the previous one immediately.</p></div></div>
           </section>
 
           <section className="card" style={{marginTop:16}}>
