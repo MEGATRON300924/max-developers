@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import crypto from "node:crypto";
 
-const DEFAULT_MAX_CLIENT_ID = "max_client_llITDlGy6a2tSJBX";
 
 function base64url(input: Buffer) {
   return input.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
@@ -12,7 +11,10 @@ function safeNext(value: string | null) {
   return value;
 }
 export async function GET(request: Request) {
-  const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID || DEFAULT_MAX_CLIENT_ID;
+  const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID?.trim();
+  if (!clientId || clientId === "REPLACE_WITH_DEVELOPER_PLATFORM_CLIENT_ID") {
+    return NextResponse.json({ error: "MAX Auth client is not configured. Set NEXT_PUBLIC_MAX_AUTH_CLIENT_ID in the deployment environment." }, { status: 500 });
+  }
   const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.name.ng";
   const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || "https://developers.max-ai.name.ng/auth/callback";
   const incoming = new URL(request.url);
@@ -29,7 +31,8 @@ export async function GET(request: Request) {
   url.searchParams.set("client_id", clientId);
   url.searchParams.set("redirect_uri", redirectUri);
   url.searchParams.set("response_type", "code");
-  url.searchParams.set("scope", "openid profile email offline_access developer:manage");
+  // Request only baseline sign-in scopes here. Optional/privileged scopes must be enabled for this client in MAX Auth first.
+  url.searchParams.set("scope", "openid profile email");
   url.searchParams.set("code_challenge", challenge);
   url.searchParams.set("code_challenge_method", "S256");
   url.searchParams.set("state", state);
