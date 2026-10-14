@@ -19,7 +19,7 @@ const errors: Record<string, string> = {
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; next?: string }>;
+  searchParams: Promise<{ error?: string; next?: string; request_id?: string }>;
 }) {
   const params = await searchParams;
   const error = params.error ? errors[params.error] || "Sign-in could not be completed. Please try again." : null;
