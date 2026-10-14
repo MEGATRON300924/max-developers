@@ -5,6 +5,9 @@ const errors: Record<string, string> = {
   missing_client: "MAX Account sign-in is not configured yet. Add the developer OAuth client ID to the deployment environment.",
   invalid_oauth_response: "The MAX Account sign-in response could not be verified. Please try again.",
   token_exchange_failed: "MAX Account could not complete the sign-in. Please try again.",
+  token_exchange_server_error: "MAX Auth encountered a server error while completing sign-in. Try again shortly. If it persists, share the request ID shown here with the MAX team.",
+  token_exchange_endpoint_missing: "The MAX Auth token endpoint could not be found. Check the MAX Auth API URL configured for MAX Developers.",
+
   token_exchange_unreachable: "MAX Auth could not be reached to finish sign-in. Please try again in a moment.",
   token_exchange_invalid_client: "MAX Auth rejected this developer application's credentials. Check that the deployed client ID matches the registered MAX Auth client, and configure MAX_AUTH_CLIENT_SECRET if the client is confidential.",
   token_exchange_invalid_grant: "The sign-in code expired or was already used. Start sign-in again and complete it in one attempt.",
@@ -20,6 +23,7 @@ export default async function SignInPage({
 }) {
   const params = await searchParams;
   const error = params.error ? errors[params.error] || "Sign-in could not be completed. Please try again." : null;
+  const requestId = params.request_id && /^[A-Za-z0-9._:-]{1,100}$/.test(params.request_id) ? params.request_id : null;
   const next = params.next && params.next.startsWith("/") && !params.next.startsWith("//") ? params.next : "/onboarding";
   const signInHref = `/auth/start?next=${encodeURIComponent(next)}`;
   const returnTo = "https://developers.max-ai.name.ng/sign-in?next=%2Fonboarding";
@@ -35,7 +39,7 @@ export default async function SignInPage({
           Use your MAX Account to manage applications, credentials and developer access.
         </p>
         {error ? (
-          <div className="auth-error" role="alert">{error}</div>
+          <div className="auth-error" role="alert">{error}{requestId ? <div style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>Request ID: <code>{requestId}</code></div> : null}</div>
         ) : null}
         <a href={signInHref} className="primary" style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
           Continue with MAX Account <ArrowRight size={16} />
