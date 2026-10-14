@@ -32,7 +32,7 @@ export async function GET(request: Request) {
   url.searchParams.set("redirect_uri", redirectUri);
   url.searchParams.set("response_type", "code");
   // Request only baseline sign-in scopes here. Optional/privileged scopes must be enabled for this client in MAX Auth first.
-  url.searchParams.set("scope", "openid profile email");
+  url.searchParams.set("scope", "openid profile email developer:manage");
   url.searchParams.set("code_challenge", challenge);
   url.searchParams.set("code_challenge_method", "S256");
   url.searchParams.set("state", state);
