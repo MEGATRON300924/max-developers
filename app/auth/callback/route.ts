@@ -27,12 +27,44 @@ export async function GET(request: Request) {
   const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.name.ng";
   const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || "https://developers.max-ai.name.ng/auth/callback";
   let tokenResponse: Response;
+  const clientSecret = process.env.MAX_AUTH_CLIENT_SECRET?.trim() || process.env.MAX_AUTH_OAUTH_CLIENT_SECRET?.trim();
   try {
-    tokenResponse = await fetch(`${authApi}/api/v1/oauth/token`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ grant_type: "authorization_code", code, client_id: clientId, redirect_uri: redirectUri, code_verifier: verifier }), cache: "no-store" });
-  } catch { return fail("token_exchange_failed"); }
-  if (!tokenResponse.ok) return fail("token_exchange_failed");
-  let token: { access_token?: string; refresh_token?: string; expires_in?: number };
-  try { token = await tokenResponse.json() as { access_token?: string; refresh_token?: string; expires_in?: number }; } catch { return fail("token_exchange_failed"); }
+    tokenResponse = await fetch(`${authApi}/api/v1/oauth/token`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        grant_type: "authorization_code",
+        code,
+        client_id: clientId,
+        ...(clientSecret ? { client_secret: clientSecret } : {}),
+        redirect_uri: redirectUri,
+        code_verifier: verifier,
+      }),
+      cache: "no-store",
+    });
+  } catch {
+    return fail("token_exchange_unreachable");
+  }
+  let tokenPayload: Record<string, unknown> = {};
+  try {
+    tokenPayload = await tokenResponse.json() as Record<string, unknown>;
+  } catch {
+    if (!tokenResponse.ok) return fail("token_exchange_failed");
+  }
+  if (!tokenResponse.ok) {
+    // Keep backend details out of the URL, but show a useful, non-sensitive reason.
+    const nested = tokenPayload.error && typeof tokenPayload.error === "object"
+      ? tokenPayload.error as Record<string, unknown>
+      : {};
+    const codeValue = String(tokenPayload.code ?? tokenPayload.error_code ?? nested.code ?? nested.error ?? tokenPayload.error ?? "").toLowerCase();
+    const messageValue = String(tokenPayload.message ?? nested.message ?? "").toLowerCase();
+    if (codeValue.includes("invalid_client") || messageValue.includes("client credentials")) return fail("token_exchange_invalid_client");
+    if (codeValue.includes("invalid_grant") || messageValue.includes("authorization code")) return fail("token_exchange_invalid_grant");
+    if (codeValue.includes("invalid_redirect_uri") || messageValue.includes("redirect uri")) return fail("token_exchange_redirect_mismatch");
+    if (codeValue.includes("pkce") || messageValue.includes("verifier")) return fail("token_exchange_pkce_failed");
+    return fail("token_exchange_failed");
+  }
+  const token = tokenPayload as { access_token?: string; refresh_token?: string; expires_in?: number };
   if (!token.access_token) return fail("missing_access_token");
   const response = NextResponse.redirect(new URL(safeRedirect, request.url));
   const secure = process.env.NODE_ENV === "production";
