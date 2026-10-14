@@ -16,9 +16,17 @@ export async function GET(request: Request) {
   const verifier = jar.get("max_oauth_verifier")?.value;
   const next = jar.get("max_oauth_next")?.value ?? null;
   const safeRedirect = safeNext(next);
-  const fail = (reason: string) => {
-    const response = NextResponse.redirect(new URL(`/sign-in?error=${encodeURIComponent(reason)}&next=${encodeURIComponent(safeRedirect)}`, request.url));
-    response.cookies.delete("max_oauth_state"); response.cookies.delete("max_oauth_verifier"); response.cookies.delete("max_oauth_next"); return response;
+  const fail = (reason: string, requestId?: string | null) => {
+    const destination = new URL("/sign-in", request.url);
+    destination.searchParams.set("error", reason);
+    destination.searchParams.set("next", safeRedirect);
+    if (requestId && /^[A-Za-z0-9._:-]{1,100}$/.test(requestId)) destination.searchParams.set("request_id", requestId);
+    const response = NextResponse.redirect(destination);
+    // Clear the temporary transaction cookies using the same path used when setting them.
+    for (const name of ["max_oauth_state", "max_oauth_verifier", "max_oauth_next"]) {
+      response.cookies.set(name, "", { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/auth", maxAge: 0 });
+    }
+    return response;
   };
   if (error) return fail(error);
   if (!code || !state || !savedState || state !== savedState || !verifier) return fail("invalid_oauth_response");
@@ -52,17 +60,24 @@ export async function GET(request: Request) {
     if (!tokenResponse.ok) return fail("token_exchange_failed");
   }
   if (!tokenResponse.ok) {
-    // Keep backend details out of the URL, but show a useful, non-sensitive reason.
+    // Log only non-secret diagnostics so the matching MAX Auth request can be found in server logs.
     const nested = tokenPayload.error && typeof tokenPayload.error === "object"
       ? tokenPayload.error as Record<string, unknown>
       : {};
-    const codeValue = String(tokenPayload.code ?? tokenPayload.error_code ?? nested.code ?? nested.error ?? tokenPayload.error ?? "").toLowerCase();
-    const messageValue = String(tokenPayload.message ?? nested.message ?? "").toLowerCase();
-    if (codeValue.includes("invalid_client") || messageValue.includes("client credentials")) return fail("token_exchange_invalid_client");
-    if (codeValue.includes("invalid_grant") || messageValue.includes("authorization code")) return fail("token_exchange_invalid_grant");
-    if (codeValue.includes("invalid_redirect_uri") || messageValue.includes("redirect uri")) return fail("token_exchange_redirect_mismatch");
-    if (codeValue.includes("pkce") || messageValue.includes("verifier")) return fail("token_exchange_pkce_failed");
-    return fail("token_exchange_failed");
+    const data = tokenPayload.data && typeof tokenPayload.data === "object"
+      ? tokenPayload.data as Record<string, unknown>
+      : {};
+    const codeValue = String(tokenPayload.code ?? tokenPayload.error_code ?? nested.code ?? nested.error_code ?? nested.error ?? data.code ?? tokenPayload.error ?? "").toLowerCase();
+    const messageValue = String(tokenPayload.message ?? nested.message ?? data.message ?? "").toLowerCase();
+    const requestId = tokenResponse.headers.get("x-request-id");
+    console.error("[MAX OAuth callback] Token exchange rejected", { status: tokenResponse.status, code: codeValue || "unknown", requestId });
+    if (codeValue.includes("invalid_client") || messageValue.includes("client credentials")) return fail("token_exchange_invalid_client", requestId);
+    if (codeValue.includes("invalid_redirect_uri") || messageValue.includes("redirect uri")) return fail("token_exchange_redirect_mismatch", requestId);
+    if (codeValue.includes("pkce") || messageValue.includes("verifier")) return fail("token_exchange_pkce_failed", requestId);
+    if (codeValue.includes("invalid_grant") || messageValue.includes("authorization code")) return fail("token_exchange_invalid_grant", requestId);
+    if (tokenResponse.status >= 500 || codeValue.includes("internal_error")) return fail("token_exchange_server_error", requestId);
+    if (tokenResponse.status === 404) return fail("token_exchange_endpoint_missing", requestId);
+    return fail("token_exchange_failed", requestId);
   }
   const token = tokenPayload as { access_token?: string; refresh_token?: string; expires_in?: number };
   if (!token.access_token) return fail("missing_access_token");
