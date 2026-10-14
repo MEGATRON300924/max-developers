@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Check, FileKey2, KeyRound, RefreshCw, ShieldCheck } from "lucide-react";
+import { ArrowRight, Check, Download, FileKey2, KeyRound, RefreshCw, RotateCcw, ShieldCheck, X } from "lucide-react";
 
 type OAuthClient = {
   id: string;
@@ -10,8 +10,10 @@ type OAuthClient = {
   name: string;
   isConfidential: boolean;
   isActive: boolean;
+  redirectUris?: string[];
   createdAt?: string;
 };
+type GeneratedCredential = { clientId: string; clientSecret: string; name: string; redirectUris: string[] };
 
 export default function CredentialsPage() {
   const [clients, setClients] = useState<OAuthClient[]>([]);
@@ -19,6 +21,8 @@ export default function CredentialsPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [rotating, setRotating] = useState<string | null>(null);
+  const [generatedCredential, setGeneratedCredential] = useState<GeneratedCredential | null>(null);
 
   async function loadClients(showRefresh = false) {
     if (showRefresh) setRefreshing(true);
@@ -47,6 +51,55 @@ export default function CredentialsPage() {
     window.setTimeout(() => setCopied(null), 1600);
   }
 
+  function downloadCredentialFile(credential: GeneratedCredential) {
+    const payload = {
+      name: credential.name,
+      client_id: credential.clientId,
+      client_secret: credential.clientSecret,
+      auth_url: "https://auth.max-ai.name.ng",
+      token_uri: "https://auth.max-ai.name.ng/api/v1/oauth/token",
+      issuer: "https://auth.max-ai.name.ng",
+      redirect_uris: credential.redirectUris,
+      note: "Keep this file private. MAX Auth will not show this client secret again. If it is lost, rotate the secret and download a new file."
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2) + "\n"], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "max-oauth-" + credential.clientId + ".json";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  async function rotateSecret(client: OAuthClient) {
+    if (!client.isConfidential) return;
+    if (!window.confirm("Rotate the client secret for “" + client.name + "”? The current secret will stop working immediately. Only continue if you can update every server that uses it.")) return;
+    setRotating(client.id);
+    setError(null);
+    setGeneratedCredential(null);
+    try {
+      const response = await fetch("/api/applications/" + encodeURIComponent(client.id) + "/rotate-secret", { method: "POST", cache: "no-store" });
+      const result = await response.json() as { data?: { clientId?: string; clientSecret?: string }; clientId?: string; clientSecret?: string; message?: string; error?: { message?: string } };
+      if (!response.ok) throw new Error(result.message || result.error?.message || "Unable to rotate this client secret.");
+      const secret = result.data?.clientSecret || result.clientSecret;
+      if (!secret) throw new Error("MAX Auth did not return a secret. Do not retry repeatedly; check MAX Auth logs first.");
+      const credential: GeneratedCredential = {
+        clientId: result.data?.clientId || result.clientId || client.clientId,
+        clientSecret: secret,
+        name: client.name,
+        redirectUris: client.redirectUris || []
+      };
+      setGeneratedCredential(credential);
+      downloadCredentialFile(credential);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to rotate this client secret.");
+    } finally {
+      setRotating(null);
+    }
+  }
+
   return (
     <div className="shell">
       <aside className="sidebar">
@@ -71,6 +124,26 @@ export default function CredentialsPage() {
             <div className="card"><FileKey2 color="var(--blue)" size={20}/><h2 className="card-title" style={{marginTop:14}}>MAX API keys</h2><p className="card-desc">Standalone MAX service API keys are not issued by the current MAX Auth API.</p><div className="metric" style={{fontSize:22}}>Not available</div><div className="metric-note">no mock credentials are shown</div></div>
           </section>
 
+          {generatedCredential ? <section className="card" role="status" style={{ marginTop: 24, borderColor: "var(--blue)" }}>
+            <div style={{display:"flex",alignItems:"flex-start",gap:12}}>
+              <div className="icon-box"><Download size={18}/></div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
+                  <h2 style={{margin:0,fontSize:16}}>Your new client secret is ready</h2>
+                  <button className="icon-button" onClick={() => setGeneratedCredential(null)} aria-label="Dismiss secret" title="Dismiss secret"><X size={15}/></button>
+                </div>
+                <p className="card-desc" style={{marginTop:8}}>A credentials JSON file has been downloaded. This is the only time MAX Developers will reveal this secret. Store it in a password manager or secure secret store; never commit it to GitHub or put it in a public environment variable.</p>
+                <label htmlFor="new-client-secret" style={{display:"block",fontSize:12,fontWeight:700,marginTop:16,marginBottom:6}}>Client secret — shown once</label>
+                <div style={{display:"flex",gap:8,alignItems:"stretch"}}>
+                  <input id="new-client-secret" readOnly value={generatedCredential.clientSecret} style={{flex:1,minWidth:0,fontFamily:"monospace",fontSize:12,padding:"10px 12px",border:"1px solid var(--border)",borderRadius:10,background:"var(--surface-soft)",color:"var(--text)"}} aria-label="New client secret"/>
+                  <button className="secondary" onClick={() => downloadCredentialFile(generatedCredential)}><Download size={14}/> Download JSON</button>
+                </div>
+                <p className="card-desc" style={{marginTop:10}}>Client ID: <code>{generatedCredential.clientId}</code></p>
+                <p className="card-desc" style={{marginTop:4}}>Dismiss this panel after saving the file. The secret cannot be retrieved again; rotate it if you lose it.</p>
+              </div>
+            </div>
+          </section> : null}
+
           <section className="section">
             <div className="section-head"><div><h2 className="section-title">OAuth credentials</h2><p className="section-desc">MAX Auth is the source of truth. Client secrets are never returned by the client list API and can only be revealed once immediately after rotation.</p></div></div>
             <div className="card list">
@@ -80,7 +153,8 @@ export default function CredentialsPage() {
                   <div className="row-main"><div className="row-title">{client.name}</div><div className="row-sub" style={{fontFamily:"monospace"}}>{client.clientId}</div><div className="row-sub">{client.isConfidential ? "Confidential · client secret enabled" : "Public · S256 PKCE"}</div></div>
                   <div style={{display:"flex",gap:8,alignItems:"center"}}>
                     <button className="icon-button" onClick={() => void copyClientId(client.clientId)} title="Copy client ID" aria-label="Copy client ID">{copied === client.clientId ? <Check size={15}/> : <KeyRound size={15}/>}</button>
-                    <Link className="secondary" href={`/applications/${encodeURIComponent(client.id)}`}>Manage <ArrowRight size={13} style={{verticalAlign:"-2px",marginLeft:5}}/></Link>
+                    {client.isConfidential ? <button className="secondary" onClick={() => void rotateSecret(client)} disabled={rotating === client.id} title="Rotate client secret"><RotateCcw size={14}/>{rotating === client.id ? "Rotating…" : "Rotate secret"}</button> : null}
+                    <Link className="secondary" href={"/applications/" + encodeURIComponent(client.id)}>Manage <ArrowRight size={13} style={{verticalAlign:"-2px",marginLeft:5}}/></Link>
                   </div>
                 </div>
               )) : <div style={{padding:"28px 18px",color:"var(--muted)",fontSize:12}}>No active OAuth applications. <Link href="/applications/new" style={{color:"var(--blue)",fontWeight:700}}>Manage applications in MAX Auth</Link>.</div>}
