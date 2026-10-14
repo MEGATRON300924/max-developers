@@ -5,6 +5,11 @@ const errors: Record<string, string> = {
   missing_client: "MAX Account sign-in is not configured yet. Add the developer OAuth client ID to the deployment environment.",
   invalid_oauth_response: "The MAX Account sign-in response could not be verified. Please try again.",
   token_exchange_failed: "MAX Account could not complete the sign-in. Please try again.",
+  token_exchange_unreachable: "MAX Auth could not be reached to finish sign-in. Please try again in a moment.",
+  token_exchange_invalid_client: "MAX Auth rejected this developer application's credentials. Check that the deployed client ID matches the registered MAX Auth client, and configure MAX_AUTH_CLIENT_SECRET if the client is confidential.",
+  token_exchange_invalid_grant: "The sign-in code expired or was already used. Start sign-in again and complete it in one attempt.",
+  token_exchange_redirect_mismatch: "The callback URL does not match the redirect URL registered in MAX Auth. It must exactly match https://developers.max-ai.name.ng/auth/callback.",
+  token_exchange_pkce_failed: "MAX Auth could not verify the sign-in challenge. Restart sign-in so a fresh security challenge is created.",
   missing_access_token: "MAX Account did not return a valid session. Please try again.",
 };
 
