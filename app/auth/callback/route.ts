@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-const DEFAULT_MAX_CLIENT_ID = "max_client_llITDlGy6a2tSJBX";
 
 function safeNext(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/onboarding";
@@ -23,7 +22,8 @@ export async function GET(request: Request) {
   };
   if (error) return fail(error);
   if (!code || !state || !savedState || state !== savedState || !verifier) return fail("invalid_oauth_response");
-  const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID || DEFAULT_MAX_CLIENT_ID;
+  const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID?.trim();
+  if (!clientId || clientId === "REPLACE_WITH_DEVELOPER_PLATFORM_CLIENT_ID") return fail("max_auth_client_not_configured");
   const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.name.ng";
   const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || "https://developers.max-ai.name.ng/auth/callback";
   let tokenResponse: Response;
