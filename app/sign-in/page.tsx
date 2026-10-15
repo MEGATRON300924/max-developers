@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Fingerprint, ShieldCheck, Sparkles } from "lucide-react";
 
 const errors: Record<string, string> = {
   missing_client: "MAX Account sign-in is not configured yet. Add the developer OAuth client ID to the deployment environment.",
@@ -7,7 +7,6 @@ const errors: Record<string, string> = {
   token_exchange_failed: "MAX Account could not complete the sign-in. Please try again.",
   token_exchange_server_error: "MAX Auth encountered a server error while completing sign-in. Try again shortly. If it persists, share the request ID shown here with the MAX team.",
   token_exchange_endpoint_missing: "The MAX Auth token endpoint could not be found. Check the MAX Auth API URL configured for MAX Developers.",
-
   token_exchange_unreachable: "MAX Auth could not be reached to finish sign-in. Please try again in a moment.",
   token_exchange_invalid_client: "MAX Auth rejected this developer application's credentials. Check that the deployed client ID matches the registered MAX Auth client, and configure MAX_AUTH_CLIENT_SECRET if the client is confidential.",
   token_exchange_invalid_grant: "The sign-in code expired or was already used. Start sign-in again and complete it in one attempt.",
@@ -16,11 +15,7 @@ const errors: Record<string, string> = {
   missing_access_token: "MAX Account did not return a valid session. Please try again.",
 };
 
-export default async function SignInPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ error?: string; next?: string; request_id?: string }>;
-}) {
+export default async function SignInPage({ searchParams }: { searchParams: Promise<{ error?: string; next?: string; request_id?: string }> }) {
   const params = await searchParams;
   const error = params.error ? errors[params.error] || "Sign-in could not be completed. Please try again." : null;
   const requestId = params.request_id && /^[A-Za-z0-9._:-]{1,100}$/.test(params.request_id) ? params.request_id : null;
@@ -30,26 +25,37 @@ export default async function SignInPage({
   const signUpHref = `https://api.max-ai.name.ng/create-account?returnTo=${encodeURIComponent(returnTo)}`;
 
   return (
-    <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 24, background: "var(--bg)" }}>
-      <section style={{ width: "100%", maxWidth: 430, textAlign: "center" }}>
-        <div className="logo" style={{ margin: "0 auto 18px", width: 48, height: 48, borderRadius: 15, fontSize: 20 }}>M</div>
-        <div className="eyebrow">MAX Developer Platform</div>
-        <h1 style={{ fontSize: 30 }}>Sign in to build with MAX</h1>
-        <p className="lead" style={{ margin: "12px auto 26px" }}>
-          Use your MAX Account to manage applications, credentials and developer access.
-        </p>
-        {error ? (
-          <div className="auth-error" role="alert">{error}{requestId ? <div style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>Request ID: <code>{requestId}</code></div> : null}</div>
-        ) : null}
-        <a href={signInHref} className="primary" style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-          Continue with MAX Account <ArrowRight size={16} />
-        </a>
-        <p style={{ marginTop: 20, color: "var(--muted)", fontSize: 12 }}>New to MAX? <a href={signUpHref} style={{ color: "var(--blue-strong)", fontWeight: 700 }}>Create a MAX Account</a></p>
-        <div style={{ marginTop: 22, color: "var(--muted)", fontSize: 11, display: "flex", justifyContent: "center", gap: 6, alignItems: "center" }}>
-          <ShieldCheck size={14} /> Secure authentication through MAX Auth
-        </div>
-        <div className="footer"><Link href="/">Return to Developer Platform</Link></div>
-      </section>
+    <main className="auth-page">
+      <div className="auth-ambient" aria-hidden="true" />
+      <header className="auth-topbar">
+        <Link href="/" className="auth-brand"><img src="/logo.svg" alt="MAX AI logo" width="38" height="38" /><span><strong>MAX AI</strong><small>FOR DEVELOPERS</small></span></Link>
+        <Link href="/" className="auth-back"><ArrowLeft size={14}/> Back to website</Link>
+      </header>
+      <div className="auth-layout">
+        <section className="auth-story">
+          <div className="auth-kicker"><Sparkles size={14}/> THE MAX AI ECOSYSTEM</div>
+          <h1>Your ideas deserve<br/><span>a bigger ecosystem.</span></h1>
+          <p>Sign in once, then manage your MAX-connected applications and developer tools from one workspace.</p>
+          <div className="auth-benefits">
+            <div><span className="auth-benefit-icon"><Fingerprint size={17}/></span><span><strong>One MAX Account</strong><small>Your identity across the ecosystem.</small></span><Check size={15}/></div>
+            <div><span className="auth-benefit-icon"><ShieldCheck size={17}/></span><span><strong>Security-first access</strong><small>Sign in through MAX Auth.</small></span><Check size={15}/></div>
+          </div>
+          <div className="auth-story-foot"><span className="auth-orb"/> Built for the next generation of MAX integrations</div>
+        </section>
+        <section className="auth-card">
+          <div className="auth-card-logo"><img src="/logo.svg" alt="MAX AI" width="47" height="47"/></div>
+          <div className="auth-card-kicker">DEVELOPER WORKSPACE</div>
+          <h2>Welcome back.</h2>
+          <p className="auth-card-copy">Use your MAX Account to continue to your developer workspace.</p>
+          {error ? <div className="auth-error" role="alert">{error}{requestId ? <div style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>Request ID: <code>{requestId}</code></div> : null}</div> : null}
+          <a href={signInHref} className="auth-continue">Continue with MAX Account <ArrowRight size={17}/></a>
+          <div className="auth-secure"><ShieldCheck size={14}/> Secure authentication powered by MAX Auth</div>
+          <div className="auth-or"><span/><small>NEW TO MAX?</small><span/></div>
+          <p className="auth-create">Create your MAX Account <a href={signUpHref}>Get started <ArrowRight size={13}/></a></p>
+          <div className="auth-card-footer">By continuing, you’ll be redirected to MAX Auth to securely sign in.</div>
+        </section>
+      </div>
+      <footer className="auth-footer"><span>© The MAX AI Ecosystem</span><span>MAX AI For Developers</span><Link href="/documentation">Developer resources</Link></footer>
     </main>
   );
 }
