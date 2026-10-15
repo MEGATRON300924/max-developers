@@ -19,9 +19,9 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "/" },
   icons: {
-    icon: [{ url: "/logo.svg", type: "image/svg+xml" }],
-    shortcut: ["/logo.svg"],
-    apple: [{ url: "/logo.svg", type: "image/svg+xml" }],
+    icon: [{ url: "https://www.max-ai.name.ng/favicon.png", type: "image/svg+xml" }],
+    shortcut: ["https://www.max-ai.name.ng/favicon.png"],
+    apple: [{ url: "https://www.max-ai.name.ng/favicon.png", type: "image/svg+xml" }],
   },
   openGraph: {
     type: "website",
@@ -29,13 +29,13 @@ export const metadata: Metadata = {
     siteName: "The MAX AI Ecosystem",
     title: siteTitle,
     description: siteDescription,
-    images: [{ url: "/logo.svg", width: 96, height: 96, alt: "MAX AI logo" }],
+    images: [{ url: "https://www.max-ai.name.ng/favicon.png", width: 96, height: 96, alt: "MAX AI logo" }],
   },
   twitter: {
     card: "summary",
     title: siteTitle,
     description: siteDescription,
-    images: ["/logo.svg"],
+    images: ["https://www.max-ai.name.ng/favicon.png"],
   },
   robots: {
     index: true,
