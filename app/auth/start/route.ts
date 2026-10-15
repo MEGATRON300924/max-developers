@@ -13,7 +13,10 @@ function safeNext(value: string | null) {
 export async function GET(request: Request) {
   const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID?.trim();
   if (!clientId || clientId === "REPLACE_WITH_DEVELOPER_PLATFORM_CLIENT_ID") {
-    return NextResponse.json({ error: "MAX Auth client is not configured. Set NEXT_PUBLIC_MAX_AUTH_CLIENT_ID in the deployment environment." }, { status: 500 });
+    const destination = new URL("/sign-in", request.url);
+    destination.searchParams.set("error", "max_auth_client_not_configured");
+    destination.searchParams.set("next", safeRedirect);
+    return NextResponse.redirect(destination);
   }
   const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.name.ng";
   const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || "https://developers.max-ai.name.ng/auth/callback";
