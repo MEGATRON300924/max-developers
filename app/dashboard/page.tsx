@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Activity, AppWindow, ArrowUpRight, BookOpen, Boxes, CheckCircle2, ChevronRight, Code2, ExternalLink, FileKey2, Gauge, LayoutDashboard, Settings, ShieldCheck, Webhook, SlidersHorizontal } from "lucide-react";
 import { getMaxUser } from "../lib/auth";
-import { authFetch } from "../lib/auth-session";
+import { authFetch } from "../../lib/auth-session";
 import UsageCard from "../components/usage-card";
 
 type OAuthClient = { id: string; clientId: string; name: string; redirectUris: string[]; scopes: string[]; isActive: boolean };
