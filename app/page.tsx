@@ -24,7 +24,7 @@ export default function LandingPage() {
         <div className="landing-nav-actions">
           <Link href="/documentation" className="landing-link">Documentation</Link>
           <Link href="/sign-in" className="landing-link">Sign in</Link>
-          <Link href="/sign-in?next=%2Fonboarding" className="primary nav-cta">Open developer portal <ArrowUpRight size={15}/></Link>
+          <Link href="/sign-in?next=%2Fdashboard" className="primary nav-cta">Open developer portal <ArrowUpRight size={15}/></Link>
         </div>
       </nav>
 
@@ -35,7 +35,7 @@ export default function LandingPage() {
         <h1>Build what’s next.<br/><span>Connect it to MAX.</span></h1>
         <p className="hero-description">The developer workspace for building applications and integrations across the MAX AI Ecosystem — from your first OAuth client to your next big idea.</p>
         <div className="landing-actions">
-          <Link href="/sign-in?next=%2Fonboarding" className="primary hero-primary">Get started <ArrowRight size={17}/></Link>
+          <Link href="/sign-in?next=%2Fdashboard" className="primary hero-primary">Get started <ArrowRight size={17}/></Link>
           <Link href="/documentation" className="secondary hero-secondary"><Code2 size={16}/> Explore the docs</Link>
         </div>
         <div className="hero-trust"><span><Check size={14}/> MAX Account</span><span><Check size={14}/> OAuth 2.0 + PKCE</span><span><Check size={14}/> Built for developers</span></div>
@@ -62,7 +62,7 @@ export default function LandingPage() {
         <div className="workflow-grid">{steps.map((step) => <article className="workflow-step" key={step.number}><span className="workflow-number">{step.number}</span><h3>{step.title}</h3><p>{step.text}</p></article>)}</div>
       </section>
 
-      <section className="landing-cta redesign-cta"><div className="cta-mark"><img src="/logo.svg" alt="" width="42" height="42"/></div><div><div className="eyebrow">READY WHEN YOU ARE</div><h2>Your next build starts with MAX.</h2><p>Sign in to open your developer workspace.</p></div><Link href="/sign-in?next=%2Fonboarding" className="primary">Open developer portal <ArrowRight size={16}/></Link></section>
+      <section className="landing-cta redesign-cta"><div className="cta-mark"><img src="/logo.svg" alt="" width="42" height="42"/></div><div><div className="eyebrow">READY WHEN YOU ARE</div><h2>Your next build starts with MAX.</h2><p>Sign in to open your developer workspace.</p></div><Link href="/sign-in?next=%2Fdashboard" className="primary">Open developer portal <ArrowRight size={16}/></Link></section>
 
       <footer className="redesign-footer"><Link href="/" className="footer-brand"><img src="/logo.svg" alt="" width="27" height="27"/><span>MAX AI FOR DEVELOPERS</span></Link><span>Part of The MAX AI Ecosystem</span><div><Link href="/documentation">Documentation</Link><Link href="https://max-ai.name.ng" target="_blank" rel="noreferrer">MAX AI <ArrowUpRight size={12}/></Link></div></footer>
     </main>
