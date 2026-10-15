@@ -87,5 +87,5 @@ export async function GET(request: Request) {
   response.cookies.set("max_access_token", token.access_token, { httpOnly: true, secure, sameSite: "lax", path: "/", maxAge: accessMaxAge });
   response.cookies.set("max_access_expires_at", String(Date.now() + accessMaxAge * 1000), { httpOnly: true, secure, sameSite: "lax", path: "/", maxAge: accessMaxAge });
   if (token.refresh_token) response.cookies.set("max_refresh_token", token.refresh_token, { httpOnly: true, secure, sameSite: "lax", path: "/", maxAge: 30 * 24 * 60 * 60 });
-  response.cookies.delete("max_oauth_state"); response.cookies.delete("max_oauth_verifier"); response.cookies.delete("max_oauth_next"); return response;
+  for (const name of ["max_oauth_state", "max_oauth_verifier", "max_oauth_next"]) { response.cookies.set(name, "", { httpOnly: true, secure, sameSite: "lax", path: "/auth", maxAge: 0 }); } return response;
 }
