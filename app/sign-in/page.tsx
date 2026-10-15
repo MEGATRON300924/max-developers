@@ -3,6 +3,7 @@ import { ArrowRight, ArrowLeft } from "lucide-react";
 
 const errors: Record<string, string> = {
   missing_client: "MAX Account sign-in is not configured yet. Add the developer OAuth client ID to the deployment environment.",
+  max_auth_client_not_configured: "MAX Account sign-in is not configured yet. The MAX Developers OAuth client ID is missing from the deployment environment.",
   invalid_oauth_response: "The MAX Account sign-in response could not be verified. Please try again.",
   token_exchange_failed: "MAX Account could not complete the sign-in. Please try again.",
   token_exchange_server_error: "MAX Auth encountered a server error while completing sign-in. Try again shortly.",
