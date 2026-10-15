@@ -11,6 +11,8 @@ function safeNext(value: string | null) {
   return value;
 }
 export async function GET(request: Request) {
+  const incoming = new URL(request.url);
+  const safeRedirect = safeNext(incoming.searchParams.get("next"));
   const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID?.trim();
   if (!clientId || clientId === "REPLACE_WITH_DEVELOPER_PLATFORM_CLIENT_ID") {
     const destination = new URL("/sign-in", request.url);
@@ -20,8 +22,6 @@ export async function GET(request: Request) {
   }
   const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.name.ng";
   const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || "https://developers.max-ai.name.ng/auth/callback";
-  const incoming = new URL(request.url);
-  const safeRedirect = safeNext(incoming.searchParams.get("next"));
   const state = base64url(crypto.randomBytes(32));
   const verifier = base64url(crypto.randomBytes(48));
   const challenge = base64url(crypto.createHash("sha256").update(verifier).digest());
