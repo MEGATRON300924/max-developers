@@ -29,13 +29,13 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
       <div className="auth-ambient" aria-hidden="true" />
       <div className="auth-brand-wrap">
         <Link href="/" className="auth-brand auth-brand-light" aria-label="MAX AI for Developers home">
-          <img src="/logo.svg" alt="MAX AI" width="42" height="42" />
+          <img src="https://www.max-ai.name.ng/favicon.png" alt="MAX AI" width="42" height="42" />
           <span><strong>MAX <em>Developers</em></strong><small>THE MAX AI ECOSYSTEM</small></span>
         </Link>
       </div>
       <div className="auth-center">
         <section className="auth-card auth-card-max">
-          <div className="auth-card-logo"><img src="/logo.svg" alt="MAX AI" width="44" height="44" /></div>
+          <div className="auth-card-logo"><img src="https://www.max-ai.name.ng/favicon.png" alt="MAX AI" width="44" height="44" /></div>
           <h1>{error ? "Let's get you signed in" : "Sign in with MAX Account"}</h1>
           <p className="auth-card-copy">Use your MAX Account to continue to MAX for Developers and manage your applications securely.</p>
           {error ? <div className="auth-error" role="alert">{error}{requestId ? <div className="auth-request-id">Request ID: <code>{requestId}</code></div> : null}</div> : null}
