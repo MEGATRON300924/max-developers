@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Activity, AppWindow, ArrowUpRight, BookOpen, Boxes, CheckCircle2, ChevronRight, Code2, ExternalLink, FileKey2, Gauge, LayoutDashboard, Settings, ShieldCheck, Webhook, SlidersHorizontal } from "lucide-react";
-import { cookies } from "next/headers";
 import { getMaxUser } from "../lib/auth";
 import { authFetch } from "../lib/auth-session";
 import UsageCard from "../components/usage-card";
 
 type OAuthClient = { id: string; clientId: string; name: string; redirectUris: string[]; scopes: string[]; isActive: boolean };
-const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.name.ng";
 const nav = [{ label: "Home", href: "/", icon: LayoutDashboard, active: true }, { label: "Applications", href: "/applications", icon: AppWindow }, { label: "Credentials", href: "/credentials", icon: FileKey2 }, { label: "Activity", href: "/activity", icon: Activity }];
 const buildNav = [{ label: "APIs", href: "/apis", icon: Code2 }, { label: "Documentation", href: "/documentation", icon: BookOpen }, { label: "Webhooks", href: "/webhooks", icon: Webhook }, { label: "SDKs", href: "/sdks", icon: Boxes }];
 const manageNav = [{ label: "Security", href: "/security", icon: ShieldCheck }, { label: "Settings", href: "/settings", icon: Settings }];
