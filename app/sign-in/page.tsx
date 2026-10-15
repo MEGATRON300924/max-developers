@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, ArrowLeft, ShieldCheck } from "lucide-react";
+import { ArrowRight, ArrowLeft } from "lucide-react";
 
 const errors: Record<string, string> = {
   missing_client: "MAX Account sign-in is not configured yet. Add the developer OAuth client ID to the deployment environment.",
@@ -40,7 +40,6 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
           <p className="auth-card-copy">Use your MAX Account to continue to MAX for Developers and manage your applications securely.</p>
           {error ? <div className="auth-error" role="alert">{error}{requestId ? <div className="auth-request-id">Request ID: <code>{requestId}</code></div> : null}</div> : null}
           <a href={signInHref} className="auth-continue">Continue with MAX Account <ArrowRight size={17}/></a>
-          <div className="auth-secure"><ShieldCheck size={14}/> Secure authentication powered by MAX Auth</div>
           <div className="auth-divider"><span>NEW TO MAX?</span></div>
           <p className="auth-create"><span>Don&apos;t have a MAX Account?</span><a href={signUpHref}>Create account <ArrowRight size={13}/></a></p>
           <p className="auth-card-footer">You’ll be redirected to MAX Auth to verify your identity. After sign-in, you’ll return to your developer dashboard.</p>
