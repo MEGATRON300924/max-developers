@@ -19,7 +19,7 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
   const params = await searchParams;
   const error = params.error ? errors[params.error] || "Sign-in could not be completed. Please try again." : null;
   const requestId = params.request_id && /^[A-Za-z0-9._:-]{1,100}$/.test(params.request_id) ? params.request_id : null;
-  const next = params.next && params.next.startsWith("/") && !params.next.startsWith("//") && !params.next.includes("\\\\") ? params.next : "/dashboard";
+  const next = params.next && params.next.startsWith("/") && !params.next.startsWith("//") && !params.next.includes("\\") ? params.next : "/dashboard";
   const signInHref = `/auth/start?next=${encodeURIComponent(next)}`;
   const returnTo = "https://developers.max-ai.name.ng/sign-in?next=%2Fdashboard";
   const signUpHref = `https://api.max-ai.name.ng/create-account?returnTo=${encodeURIComponent(returnTo)}`;
@@ -49,7 +49,7 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
       </div>
       <footer className="auth-footer auth-footer-max">
         <span>© The MAX AI Ecosystem</span>
-        <span><Link href="/privacy">Privacy</Link> · <Link href="/terms">Terms</Link></span>
+        <span><Link href="/privacy-policy">Privacy</Link> · <Link href="/terms-of-service">Terms</Link></span>
       </footer>
     </main>
   );
