@@ -1,3 +1,4 @@
+import { MAX_AUTH_API_URL } from "../../lib/max-auth-config";
 import { cookies } from "next/headers";
 
 export type MaxUser = {
@@ -8,7 +9,8 @@ export type MaxUser = {
   picture?: string;
 };
 
-const authApi = (process.env.MAX_AUTH_URL || "https://auth.max-ai.name.ng").replace(/\/$/, "");
+  const authApi = MAX_AUTH_API_URL;
+
 
 export async function getMaxUser(): Promise<MaxUser | null> {
   const token = (await cookies()).get("max_access_token")?.value;
