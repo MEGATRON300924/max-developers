@@ -2,8 +2,8 @@ import { MAX_AUTH_API_URL } from "../../../lib/max-auth-config";
 import { NextResponse } from "next/server";
 
 function safeNext(value: string | null) {
-  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/";
-  return value;
+  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/dashboard";
+  return value === "/" ? "/dashboard" : value;
 }
 
 function getCookie(request: Request, name: string) {
@@ -18,6 +18,21 @@ function clearSession(response: NextResponse) {
     response.cookies.set(name, "", { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 0 });
   }
   return response;
+}
+
+type TokenResponse = { access_token?: string; refresh_token?: string; expires_in?: number };
+function normalizeToken(payload: unknown): TokenResponse | null {
+  if (!payload || typeof payload !== "object") return null;
+  const outer = payload as Record<string, unknown>;
+  const candidate = outer.data && typeof outer.data === "object"
+    ? outer.data as Record<string, unknown>
+    : outer;
+  if (typeof candidate.access_token !== "string" || !candidate.access_token) return null;
+  return {
+    access_token: candidate.access_token,
+    refresh_token: typeof candidate.refresh_token === "string" ? candidate.refresh_token : undefined,
+    expires_in: typeof candidate.expires_in === "number" ? candidate.expires_in : undefined,
+  };
 }
 
 export async function GET(request: Request) {
@@ -51,8 +66,8 @@ export async function GET(request: Request) {
       cache: "no-store",
     });
     if (!tokenResponse.ok) throw new Error("refresh_failed");
-    const token = await tokenResponse.json() as { access_token?: string; refresh_token?: string; expires_in?: number };
-    if (!token.access_token) throw new Error("missing_access_token");
+    const token = normalizeToken(await tokenResponse.json());
+    if (!token?.access_token) throw new Error("missing_access_token");
 
     const secure = process.env.NODE_ENV === "production";
     const accessMaxAge = Math.max(60, token.expires_in ?? 3600);
