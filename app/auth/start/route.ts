@@ -1,4 +1,4 @@
-import { MAX_AUTH_API_URL } from "../../../lib/max-auth-config";
+import { MAX_AUTH_API_URL, MAX_DEVELOPERS_URL } from "../../../lib/max-auth-config";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import crypto from "node:crypto";
@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     return NextResponse.redirect(destination);
   }
   const authApi = MAX_AUTH_API_URL;
-  const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || "https://developers.max-ai.name.ng/auth/callback";
+  const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || `${MAX_DEVELOPERS_URL}/auth/callback`;
   const state = base64url(crypto.randomBytes(32));
   const verifier = base64url(crypto.randomBytes(48));
   const challenge = base64url(crypto.createHash("sha256").update(verifier).digest());
