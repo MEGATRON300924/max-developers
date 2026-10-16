@@ -16,6 +16,7 @@ const errors: Record<string, string> = {
   token_exchange_pkce_failed: "MAX Auth could not verify the sign-in challenge. Restart sign-in so a fresh security challenge is created.",
   missing_access_token: "MAX Account did not return a valid session. Please try again.",
   userinfo_validation_failed: "MAX Auth returned a session that could not be verified. Please restart sign-in. If this keeps happening, contact support with the time of your attempt.",
+  session_expired: "Your MAX Account session could not be renewed. Please sign in again.",
 };
 
 export default async function SignInPage({ searchParams }: { searchParams: Promise<{ error?: string; next?: string; request_id?: string }> }) {
