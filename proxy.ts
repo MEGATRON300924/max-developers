@@ -4,13 +4,19 @@ import type { NextRequest } from "next/server";
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
+  // Public routes must remain readable without a MAX Account. The docs explain
+  // how to integrate MAX Auth, so requiring MAX Auth to read them creates a loop.
   if (
     pathname.startsWith("/_next/") ||
     pathname === "/favicon.ico" ||
     pathname.startsWith("/api/") ||
     pathname.startsWith("/auth/") ||
     pathname === "/sign-in" ||
-    pathname === "/health"
+    pathname === "/health" ||
+    pathname === "/docs" ||
+    pathname.startsWith("/docs/") ||
+    pathname === "/documentation" ||
+    pathname.startsWith("/documentation/")
   ) {
     return NextResponse.next();
   }
