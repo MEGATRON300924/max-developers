@@ -1,4 +1,4 @@
-import { MAX_AUTH_FRONTEND_URL } from "../../lib/max-auth-config";
+import { MAX_AUTH_FRONTEND_URL, MAX_DEVELOPERS_URL } from "../../lib/max-auth-config";
 import Link from "next/link";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 
@@ -25,7 +25,7 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
   const next = params.next && params.next.startsWith("/") && !params.next.startsWith("//") && !params.next.includes("\\") ? params.next : "/dashboard";
   const signInHref = `/auth/start?next=${encodeURIComponent(next)}`;
       const authFrontend = MAX_AUTH_FRONTEND_URL;
-  const returnTo = "https://developers.max-ai.name.ng/sign-in?next=%2Fdashboard";
+  const returnTo = `${MAX_DEVELOPERS_URL}/sign-in?next=%2Fdashboard`;
   const signUpHref = `${authFrontend}/create-account?returnTo=${encodeURIComponent(returnTo)}`;
 
   return (
