@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.name.ng";
+const authApi = (process.env.MAX_AUTH_URL || "https://auth.max-ai.name.ng").replace(/\\/$/, "");
 const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID?.trim() || "";
 const accessCookie = "max_access_token"; const refreshCookie = "max_refresh_token"; const expiryCookie = "max_access_expires_at";
 function cookieOptions(maxAge: number) { return { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" as const, path: "/", maxAge }; }
