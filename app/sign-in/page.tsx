@@ -23,7 +23,7 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
   const requestId = params.request_id && /^[A-Za-z0-9._:-]{1,100}$/.test(params.request_id) ? params.request_id : null;
   const next = params.next && params.next.startsWith("/") && !params.next.startsWith("//") && !params.next.includes("\\") ? params.next : "/dashboard";
   const signInHref = `/auth/start?next=${encodeURIComponent(next)}`;
-    const authFrontend = (process.env.NEXT_PUBLIC_MAX_AUTH_FRONTEND_URL || "https://auth.max-ai.name.ng").replace(/\/$/, "");
+    const authFrontend = (process.env.NEXT_PUBLIC_MAX_AUTH_FRONTEND_URL || "https://api.max-ai.name.ng").replace(/\/$/, "");
   const returnTo = "https://developers.max-ai.name.ng/sign-in?next=%2Fdashboard";
   const signUpHref = `${authFrontend}/create-account?returnTo=${encodeURIComponent(returnTo)}`;
 
