@@ -32,7 +32,7 @@ export async function GET(request: Request) {
   if (!code || !state || !savedState || state !== savedState || !verifier) return fail("invalid_oauth_response");
   const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID?.trim();
   if (!clientId || clientId === "REPLACE_WITH_DEVELOPER_PLATFORM_CLIENT_ID") return fail("max_auth_client_not_configured");
-  const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.name.ng";
+  const authApi = (process.env.MAX_AUTH_URL || "https://auth.max-ai.name.ng").replace(/\\/$/, "");
   const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || "https://developers.max-ai.name.ng/auth/callback";
   let tokenResponse: Response;
   const clientSecret = process.env.MAX_AUTH_CLIENT_SECRET?.trim() || process.env.MAX_AUTH_OAUTH_CLIENT_SECRET?.trim();
@@ -81,6 +81,36 @@ export async function GET(request: Request) {
   }
   const token = (tokenPayload.data && typeof tokenPayload.data === "object" ? tokenPayload.data : tokenPayload) as { access_token?: string; refresh_token?: string; expires_in?: number };
   if (!token.access_token) return fail("missing_access_token");
+
+  // Verify the new token against MAX Auth before creating a local session.
+  // This prevents a callback from redirecting to /dashboard only to be bounced
+  // straight back to /sign-in when UserInfo rejects the token.
+  let userInfoResponse: Response;
+  try {
+    userInfoResponse = await fetch(`${authApi}/api/v1/oauth/userinfo`, {
+      headers: { Authorization: `Bearer ${token.access_token}` },
+      cache: "no-store",
+    });
+  } catch {
+    return fail("userinfo_validation_failed");
+  }
+  if (!userInfoResponse.ok) return fail("userinfo_validation_failed");
+  try {
+    const userInfoPayload = await userInfoResponse.json() as Record<string, unknown>;
+    const data = userInfoPayload.data && typeof userInfoPayload.data === "object"
+      ? userInfoPayload.data as Record<string, unknown>
+      : userInfoPayload;
+    const profile = data.user && typeof data.user === "object"
+      ? data.user as Record<string, unknown>
+      : data.profile && typeof data.profile === "object"
+        ? data.profile as Record<string, unknown>
+        : data;
+    const subject = profile.sub ?? profile.id;
+    if (typeof subject !== "string" || !subject.trim()) return fail("userinfo_validation_failed");
+  } catch {
+    return fail("userinfo_validation_failed");
+  }
+
   const response = NextResponse.redirect(new URL(safeRedirect === "/" ? "/dashboard" : safeRedirect, request.url));
   const secure = process.env.NODE_ENV === "production";
   const accessMaxAge = Math.max(60, token.expires_in ?? 3600);
