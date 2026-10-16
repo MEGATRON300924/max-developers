@@ -8,7 +8,7 @@ export type MaxUser = {
   picture?: string;
 };
 
-const authApi = (process.env.MAX_AUTH_URL || "https://auth.max-ai.name.ng").replace(/\\/$/, "");
+const authApi = (process.env.MAX_AUTH_URL || "https://auth.max-ai.name.ng").replace(/\/$/, "");
 
 export async function getMaxUser(): Promise<MaxUser | null> {
   const token = (await cookies()).get("max_access_token")?.value;
