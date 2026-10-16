@@ -1,4 +1,4 @@
-import { MAX_AUTH_API_URL } from "../../../lib/max-auth-config";
+import { MAX_AUTH_API_URL, MAX_DEVELOPERS_URL } from "../../../lib/max-auth-config";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
   const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID?.trim();
   if (!clientId || clientId === "REPLACE_WITH_DEVELOPER_PLATFORM_CLIENT_ID") return fail("max_auth_client_not_configured");
   const authApi = MAX_AUTH_API_URL;
-  const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || "https://developers.max-ai.name.ng/auth/callback";
+  const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || `${MAX_DEVELOPERS_URL}/auth/callback`;
   let tokenResponse: Response;
   const clientSecret = process.env.MAX_AUTH_CLIENT_SECRET?.trim() || process.env.MAX_AUTH_OAUTH_CLIENT_SECRET?.trim();
   try {
