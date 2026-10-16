@@ -79,7 +79,7 @@ export async function GET(request: Request) {
     if (tokenResponse.status === 404) return fail("token_exchange_endpoint_missing", requestId);
     return fail("token_exchange_failed", requestId);
   }
-  const token = tokenPayload as { access_token?: string; refresh_token?: string; expires_in?: number };
+  const token = (tokenPayload.data && typeof tokenPayload.data === "object" ? tokenPayload.data : tokenPayload) as { access_token?: string; refresh_token?: string; expires_in?: number };
   if (!token.access_token) return fail("missing_access_token");
   const response = NextResponse.redirect(new URL(safeRedirect === "/" ? "/dashboard" : safeRedirect, request.url));
   const secure = process.env.NODE_ENV === "production";
