@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     destination.searchParams.set("next", safeRedirect);
     return NextResponse.redirect(destination);
   }
-  const authApi = process.env.NEXT_PUBLIC_MAX_AUTH_URL || "https://auth.max-ai.name.ng";
+  const authApi = (process.env.MAX_AUTH_URL || "https://auth.max-ai.name.ng").replace(/\\/$/, "");
   const redirectUri = process.env.NEXT_PUBLIC_MAX_AUTH_REDIRECT_URI || "https://developers.max-ai.name.ng/auth/callback";
   const state = base64url(crypto.randomBytes(32));
   const verifier = base64url(crypto.randomBytes(48));
