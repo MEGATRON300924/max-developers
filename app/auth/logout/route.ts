@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-const authApi = (process.env.MAX_AUTH_URL || "https://auth.max-ai.name.ng").replace(/\\/$/, "");
+const authApi = (process.env.MAX_AUTH_URL || "https://auth.max-ai.name.ng").replace(/\/$/, "");
 const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID?.trim() || "";
 function getCookie(request: Request, name: string) { const cookieHeader = request.headers.get("cookie") || ""; const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${name}=([^;]*)`)); if (!match) return null; try { return decodeURIComponent(match[1]); } catch { return null; } }
 export async function GET(request: Request) {
