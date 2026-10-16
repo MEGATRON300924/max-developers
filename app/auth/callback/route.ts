@@ -81,7 +81,7 @@ export async function GET(request: Request) {
   }
   const token = tokenPayload as { access_token?: string; refresh_token?: string; expires_in?: number };
   if (!token.access_token) return fail("missing_access_token");
-  const response = NextResponse.redirect(new URL(safeRedirect, request.url));
+  const response = NextResponse.redirect(new URL(safeRedirect === "/" ? "/dashboard" : safeRedirect, request.url));
   const secure = process.env.NODE_ENV === "production";
   const accessMaxAge = Math.max(60, token.expires_in ?? 3600);
   response.cookies.set("max_access_token", token.access_token, { httpOnly: true, secure, sameSite: "lax", path: "/", maxAge: accessMaxAge });
