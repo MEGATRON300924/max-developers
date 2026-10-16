@@ -1,3 +1,4 @@
+import { MAX_AUTH_API_URL } from "../../../lib/max-auth-config";
 import { NextResponse } from "next/server";
 
 function safeNext(value: string | null) {
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
   const next = safeNext(incoming.searchParams.get("next"));
   const refreshToken = getCookie(request, "max_refresh_token");
   const clientId = process.env.NEXT_PUBLIC_MAX_AUTH_CLIENT_ID?.trim();
-  const authApi = (process.env.MAX_AUTH_URL || "https://auth.max-ai.name.ng").replace(/\/$/, "");
+  const authApi = MAX_AUTH_API_URL;
   const clientSecret = process.env.MAX_AUTH_CLIENT_SECRET?.trim() || process.env.MAX_AUTH_OAUTH_CLIENT_SECRET?.trim();
 
   if (!clientId || clientId === "REPLACE_WITH_DEVELOPER_PLATFORM_CLIENT_ID") {
