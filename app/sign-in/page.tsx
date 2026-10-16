@@ -14,6 +14,7 @@ const errors: Record<string, string> = {
   token_exchange_redirect_mismatch: "The callback URL does not match the redirect URL registered in MAX Auth. It must exactly match https://developers.max-ai.name.ng/auth/callback.",
   token_exchange_pkce_failed: "MAX Auth could not verify the sign-in challenge. Restart sign-in so a fresh security challenge is created.",
   missing_access_token: "MAX Account did not return a valid session. Please try again.",
+  userinfo_validation_failed: "MAX Auth returned a session that could not be verified. Please restart sign-in. If this keeps happening, contact support with the time of your attempt.",
 };
 
 export default async function SignInPage({ searchParams }: { searchParams: Promise<{ error?: string; next?: string; request_id?: string }> }) {
