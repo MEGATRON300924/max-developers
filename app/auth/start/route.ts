@@ -35,10 +35,9 @@ export async function GET(request: Request) {
   url.searchParams.set("client_id", clientId);
   url.searchParams.set("redirect_uri", redirectUri);
   url.searchParams.set("response_type", "code");
-  // Request only baseline sign-in scopes here. Optional/privileged scopes must be enabled for this client in MAX Auth first.
-  // Request offline_access so MAX Auth can issue a refresh token for the dashboard session.
-  // The client must have offline_access enabled in its MAX Auth scope configuration.
-  url.searchParams.set("scope", "openid profile email offline_access");
+  // The official MAX for Developers client uses developer:manage for portal access.
+  // offline_access allows MAX Auth to issue a refresh token for the dashboard session.
+  url.searchParams.set("scope", "openid profile email offline_access developer:manage");
   url.searchParams.set("code_challenge", challenge);
   url.searchParams.set("code_challenge_method", "S256");
   url.searchParams.set("state", state);
