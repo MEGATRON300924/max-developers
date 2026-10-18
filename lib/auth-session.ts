@@ -64,7 +64,7 @@ export async function authFetchPath(basePath: string, path = "", init?: RequestI
   let accessToken = jar.get(accessCookie)?.value;
   if (!accessToken) accessToken = await refreshSession(jar) || undefined;
   if (!accessToken) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  const request = () => fetch(`${authApi}/api/v1/${basePath.replace(/^\\/+|\\/+$/g, "")}${path}`, {
+  const request = () => fetch(`${authApi}/api/v1/${basePath.replace(/^\/+|\/+$/g, "")}${path}`, {
     ...init,
     headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json", ...(init?.headers || {}) },
     cache: "no-store",
