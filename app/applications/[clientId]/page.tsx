@@ -147,7 +147,12 @@ export default function ApplicationDetailsPage({ params }: { params: Promise<{ c
             <>
               <div className="hero">
                 <div><div className="eyebrow">Application</div><h1>{client.name}</h1><p className="lead">Configure how this application connects to MAX Account.</p></div>
-                <span className="status" style={{opacity:client.isActive ? 1 : .55}}>{client.isActive ? "Active" : "Revoked"}</span>
+                <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+                  <Link href={`/applications/${encodeURIComponent(client.id)}/configuration`} className="secondary" style={{display:"inline-flex",alignItems:"center",gap:7,textDecoration:"none"}}>
+                    <ShieldCheck size={15}/> Full configuration <ExternalLink size={13}/>
+                  </Link>
+                  <span className="status" style={{opacity:client.isActive ? 1 : .55}}>{client.isActive ? "Active" : "Revoked"}</span>
+                </div>
               </div>
 
               <section className="card" style={{marginTop:24}}>

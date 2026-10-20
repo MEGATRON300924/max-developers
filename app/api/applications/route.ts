@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
-import { authFetch } from "../../../lib/auth-session";
+import { authFetch, authFetchPath } from "../../../lib/auth-session";
 
 export async function GET() {
+  const adminResponse = await authFetchPath("admin/oauth-clients");
+  if (adminResponse.status === 200) return adminResponse;
+  if (adminResponse.status !== 403) return adminResponse;
   return authFetch("");
 }
 
