@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { authFetch } from "../../../../lib/auth-session";
+import { authFetch, authFetchPath } from "../../../../lib/auth-session";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ clientId: string }> }) {
   const { clientId } = await params;
@@ -34,6 +34,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ cl
     if (Array.isArray(body.scopes) && body.scopes.includes("developer:manage") && !(await isMaxAdmin())) {
       return NextResponse.json({ message: "The developer:manage permission is restricted to approved MAX AI Ecosystem administrators." }, { status: 403 });
     }
+    const adminResponse = await authFetchPath(`admin/oauth-clients/${encodeURIComponent(clientId)}`, "", { method: "PATCH", body: JSON.stringify(body) });
+    if (adminResponse.status === 200) return adminResponse;
+    if (adminResponse.status !== 403) return adminResponse;
     return authFetch(`/${encodeURIComponent(clientId)}`, { method: "PATCH", body: JSON.stringify(body) });
   } catch {
     return NextResponse.json({ message: "Invalid JSON body" }, { status: 400 });
