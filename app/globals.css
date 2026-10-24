@@ -344,3 +344,81 @@ a { color:inherit; text-decoration:none; } button,input,textarea { font:inherit;
   .auth-page-max .auth-card-max { padding:30px 22px 25px; }
   .auth-page-max .auth-create { align-items:flex-start; flex-direction:column; gap:10px; }
 }
+
+
+/* Mobile density pass: preserve hierarchy while reducing scrolling and oversized controls. */
+@media (max-width: 600px) {
+  .topbar { height: 56px; padding: 0 14px; }
+  .breadcrumb { font-size: 11px; }
+  .account { gap: 7px; }
+  .avatar { width: 30px; height: 30px; }
+  .content { width: calc(100% - 24px); padding: 20px 0 32px; }
+  h1 { font-size: 24px; line-height: 1.18; letter-spacing: -.04em; }
+  .eyebrow { font-size: 10px; margin-bottom: 6px; }
+  .lead { margin-top: 7px; font-size: 12px; line-height: 1.55; }
+  .hero, .dashboard-hero { gap: 13px; margin-bottom: 17px; }
+  .hero-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; }
+  .hero-actions .primary, .hero-actions .secondary { width: 100%; min-width: 0; padding: 10px 9px; font-size: 10px; line-height: 1.25; }
+  .hero-actions .primary { grid-column: 1 / -1; }
+  .primary { padding: 10px 13px; font-size: 11px; }
+  .secondary { padding: 9px 11px; font-size: 10px; }
+  .overview-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; }
+  .overview-card { min-height: 0; padding: 11px 9px; display: block; border-radius: 12px; }
+  .overview-icon { width: 29px; height: 29px; border-radius: 9px; margin-bottom: 9px; }
+  .overview-icon svg { width: 15px; height: 15px; }
+  .overview-copy span { font-size: 9px; line-height: 1.3; }
+  .overview-copy strong { margin-top: 5px; font-size: 21px; }
+  .overview-copy small { margin-top: 5px; font-size: 8px; line-height: 1.35; }
+  .overview-arrow { display: none; }
+  .dashboard-columns { gap: 10px; margin-top: 10px; }
+  .dashboard-panel { border-radius: 13px; }
+  .panel-head { padding: 12px 13px; gap: 8px; }
+  .panel-head h2 { font-size: 12px; }
+  .panel-head p { font-size: 9px; line-height: 1.45; }
+  .panel-link { font-size: 9px; }
+  .dashboard-list-row { min-height: 57px; gap: 8px; padding: 9px 10px; }
+  .list-icon { width: 30px; height: 30px; border-radius: 8px; }
+  .list-icon svg { width: 15px; height: 15px; }
+  .dashboard-list-row .row-title { font-size: 10px; line-height: 1.35; }
+  .dashboard-list-row .row-sub { font-size: 8px; }
+  .dashboard-list-row .row-chevron { width: 13px; }
+  .dashboard-side { gap: 10px; }
+  .coming-card, .connection-status { margin: 0 10px 10px; padding: 10px; gap: 8px; }
+  .dashboard-empty { padding: 24px 14px; }
+  .dashboard-empty p { margin: 6px auto 12px; font-size: 9px; }
+  .dashboard-section, .section { margin-top: 22px; }
+  .section-head { margin-bottom: 10px; }
+  .section-title { font-size: 16px; }
+  .section-desc { font-size: 10px; line-height: 1.5; }
+  .starter-grid { grid-template-columns: 1fr; gap: 7px; }
+  .starter-card { min-height: 0; padding: 11px; gap: 9px; border-radius: 11px; }
+  .starter-card strong { font-size: 10px; }
+  .starter-card span { margin-top: 3px; font-size: 9px; }
+  .quick-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; }
+  .quick { padding: 10px; gap: 8px; border-radius: 11px; align-items:flex-start; }
+  .quick svg { width: 15px; height: 15px; flex:none; }
+  .quick strong { font-size: 10px; }
+  .quick span { font-size: 8px; line-height: 1.4; }
+  .footer { margin-top: 24px; gap: 8px; flex-wrap: wrap; font-size: 9px; }
+  .card { padding: 14px; border-radius: 13px; }
+  .list-row { min-height: 0; display: grid; grid-template-columns: 30px minmax(0,1fr) auto; gap: 8px; padding: 12px 10px; }
+  .list-row .icon-box { width: 30px; height: 30px; border-radius: 9px; }
+  .list-row .row-main { grid-column: 2 / 4; }
+  .list-row .row-title { font-size: 11px; }
+  .list-row .row-sub { white-space: normal; overflow-wrap: anywhere; line-height: 1.45; }
+  .list-row .status { display: inline-flex; grid-column: 1 / 2; grid-row: 2; font-size: 8px; padding: 4px 6px; justify-self: start; }
+  .list-row > a.secondary { grid-column: 2 / 4; width: 100%; justify-content: center; padding: 9px; }
+  .list-row > .icon-button { grid-column: 3; grid-row: 1; }
+  .list-row > button.icon-button { grid-column: 3; }
+  .scope-grid { gap: 7px; }
+  .scope-option { padding: 10px; gap: 8px; }
+  .footer { padding-bottom: 8px; }
+}
+@media (min-width: 601px) and (max-width: 900px) {
+  .dashboard-content { padding-top: 25px; }
+  .dashboard-hero { gap: 16px; margin-bottom: 20px; }
+  .overview-card { padding: 14px; min-height: 110px; }
+  .overview-copy strong { font-size: 23px; }
+  .dashboard-columns { grid-template-columns: minmax(0,1.3fr) minmax(230px,.9fr); gap: 10px; }
+  .starter-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
